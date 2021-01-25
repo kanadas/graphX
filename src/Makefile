@@ -2,10 +2,10 @@ ODIR		= obj
 LDIR 		= ../lib
 
 CC 			= g++
-CFLAGS 		:= -I$(LDIR) -I$(LDIR)/spdlog/include `pkg-config --cflags glfw3`
+CFLAGS 		= -I$(LDIR) -rdynamic `pkg-config --cflags glfw3` `pkg-config spdlog --cflags`
 VPATH 		= tests util
 
-LIBFLAGS 	:= `pkg-config --static --libs glfw3`
+LIBFLAGS 	= `pkg-config --static --libs glfw3` `pkg-config --static --libs spdlog`
 IMGUISRC 	= $(wildcard $(LDIR)/imgui/*.cpp)
 IMGUI 		= $(patsubst %.cpp, %.o, $(IMGUISRC))
 _LIBS 		= glad/glad.o

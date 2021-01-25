@@ -114,6 +114,7 @@ void TestBatch2D::onUpdate(float deltatime)
 void TestBatch2D::onRender()
 {
     Renderer renderer;
+    renderer.clear();
     textureA->bind(0);
     textureB->bind(1);
 

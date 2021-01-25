@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <iostream>
-
+#include <execinfo.h>
 #include "errors.h"
 
 // Callback function for printing debug statements

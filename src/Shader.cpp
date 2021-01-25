@@ -5,8 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include "errors.h"
+#include "utils/Log.h"
 
 Shader::Shader(const std::string& vertexShader, const std::string& fragmentShader)
 {
@@ -37,9 +36,6 @@ GLuint Shader::compileShader(const std::string& filepath, GLenum type)
     const char* src = str.c_str();
     int len = str.length();
 
-    //std::cout << "Read "  << len << " characters from file " << filepath << std::endl;
-    //std::cout << str << std::endl;
-
     glShaderSource(id, 1, &src, &len);
     glCompileShader(id);
 
@@ -60,6 +56,7 @@ GLuint Shader::compileShader(const std::string& filepath, GLenum type)
         std::cerr << "shader!\n" << message << "\n";
         throw "ShaderException";
     }
+    TRACE("Compiled shader {}", filepath);
     return id;
 }
 

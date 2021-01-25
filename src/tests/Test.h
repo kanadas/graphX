@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include <iostream>
+#include "../utils/Log.h"
 
 namespace test {
 
@@ -28,7 +28,7 @@ public:
     template <typename T>
     void registerTest(const std::string& name)
     {
-        std::cout << "Registering test " << name << std::endl;
+        INFO("Registering test {}", name);
         tests.push_back(std::make_pair(name, []() { return new T(); }));
     }
 

@@ -1,21 +1,25 @@
 #include "Window.h"
 
 #include "utils/Log.h"
+#include "utils/errors.h"
+#include "utils/stacktrace.cxx"
 
 static bool glfwInitialized = false;
 
 static void GLFWErrorCallback(int error, const char* description)
 {
-    ERROR("Error {}: {}", error, description);
+    ERROR("Error {}: {}\n{}", error, description, Backtrace());
 }
 
 Window::Window(const std::string& title, uint32_t width, uint32_t height, std::function<void(Event&)> callback)
 {
+    TRACE("Creating window {} {} {}", title, width, height);
     windowData.width = width;
     windowData.height = height;
     windowData.eventCallback = callback;
 
     if (!glfwInitialized) {
+        TRACE("Initializing GLFW");
         if (!glfwInit()) {
             ERROR("GLFW initialization failed!\n");
             exit(1);
@@ -52,7 +56,6 @@ Window::Window(const std::string& title, uint32_t width, uint32_t height, std::f
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
         data.width = width;
         data.height = height;
-
         WindowResizeEvent event(width, height);
         data.eventCallback(event);
     });
@@ -123,6 +126,7 @@ void Window::onUpdate()
 void Window::shutdown()
 {
     glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 void Window::setVSync(bool enabled)

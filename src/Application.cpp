@@ -1,3 +1,4 @@
+#include "Application.h"
 #include <cstdlib>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -14,7 +15,7 @@
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 #include "linalg.h"
-#include "errors.h"
+#include "utils/errors.h"
 #include "utils/Log.h"
 #include "Event.h"
 
@@ -22,72 +23,58 @@
 #include "tests/TestTexture2D.h"
 #include "tests/TestBatch2D.h"
 
-// F will be deduced by the compiler
-template <typename T, typename E, typename F>
-bool Dispatch(E event, const F& func)
+#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+
+Application* Application::instance = nullptr;
+
+Application::Application(const std::string name, uint32_t width, uint32_t height)
 {
-    if (std::is_base_of<T, E>::value) {
-        event.handled = func(static_cast<T&>(event));
-        return true;
-    }
-    return false;
-}
-
-static bool shouldClose = false;
-
-static bool keyCallback(KeyEvent event)
-{
-    if (event.getKey() == GLFW_KEY_ESCAPE && event.getAction() == KeyEvent::Action::PRESS) {
-        shouldClose = true;
-        return true;
-    }
-    return false;
-}
-
-static bool windowClosedCallback(WindowCloseEvent event)
-{
-    shouldClose = true;
-    return true;
-}
-
-static void eventCallback(Event event)
-{
-    Dispatch<KeyEvent>(event, keyCallback);
-    Dispatch<WindowCloseEvent>(event, windowClosedCallback);
-}
-
-int main(int argc, char* argv[])
-{
-    Log::init();
-
-    const float WIDTH = 1024;
-    const float HEIGHT = 768;
-    Window window("graphX", WIDTH, HEIGHT, eventCallback);
-
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(GLDebugMessageCallback, NULL);
+    TRACE("Creating Application {} {} {}", name, width, height);
+    window = std::make_unique<Window>(name, width, height, BIND_EVENT_FN(onEvent));
 
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window.getNativeWindow(), true);
+    ImGui_ImplGlfw_InitForOpenGL(window->getNativeWindow(), true);
     ImGui_ImplOpenGL3_Init(NULL);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    Renderer renderer;
-
-    test::Test* currentTest = nullptr;
-    test::TestMenu* testMenu = new test::TestMenu(currentTest);
+    testMenu = new test::TestMenu(currentTest);
+    currentTest = new test::TestBatch2D();
 
     testMenu->registerTest<test::TestClearColor>("Clear Color");
     testMenu->registerTest<test::TestTexture2D>("Texture 2D");
     testMenu->registerTest<test::TestBatch2D>("Batch 2D");
 
-    //currentTest = testMenu;
-    currentTest = new test::TestBatch2D();
+}
 
-    while (!shouldClose) {
+Application::~Application()
+{
+    delete currentTest;
+    if (currentTest != testMenu) {
+        delete testMenu;
+    }
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+Application& Application::init(const std::string name, uint32_t width, uint32_t height)
+{
+    TRACE("Application INIT");
+    if (instance == nullptr) {
+        TRACE("Creating Application");
+        instance = new Application(name, width, height);
+    }
+    return *instance;
+}
+
+void Application::run()
+{
+    Renderer renderer;
+    TRACE("Application started");
+    while (running) {
         renderer.clear();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -95,7 +82,10 @@ int main(int argc, char* argv[])
         ImGui::NewFrame();
 
         if (currentTest) {
-            currentTest->onUpdate(0.0f);
+            float time = (float)glfwGetTime();
+            float timestep = time - lastFrameTime;
+            lastFrameTime = time;
+            currentTest->onUpdate(timestep);
             currentTest->onRender();
             ImGui::Begin("Test");
             if (currentTest != testMenu && ImGui::Button("<-")) {
@@ -108,16 +98,35 @@ int main(int argc, char* argv[])
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        window.onUpdate();
+        window->onUpdate();
     }
+}
 
-    delete currentTest;
-    if (currentTest != testMenu) {
-        delete testMenu;
+static bool keyCallback(KeyEvent& event)
+{
+    TRACE("keyCallback");
+    if (event.getKey() == GLFW_KEY_ESCAPE && event.getAction() == KeyEvent::Action::PRESS) {
+        Application::Get().close();
+        return true;
     }
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-    glfwTerminate();
-    return 0;
+    return false;
+}
+
+bool Application::onWindowClose(WindowCloseEvent& e)
+{
+    TRACE("windowClosedCallback");
+    close();
+    return true;
+}
+
+
+void Application::onEvent(Event& event)
+{
+    DispatchEvent<KeyEvent>(event, keyCallback);
+    DispatchEvent<WindowCloseEvent>(event, BIND_EVENT_FN(onWindowClose));
+}
+
+void Application::close()
+{
+    running = false;
 }
