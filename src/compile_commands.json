@@ -4,209 +4,239 @@
       "/usr/bin/g++",
       "-c",
       "-o",
-      "obj/algebra.o",
-      "algebra.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/algebra.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/algebra.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/Application.o",
+      "obj/./Application.o",
       "Application.cpp",
       "-I../lib",
+      "-I../lib/spdlog/include",
       "-I/usr/local/include"
     ],
     "directory": "/home/tkanas/Studies/Grafika/graphX/src",
     "file": "/home/tkanas/Studies/Grafika/graphX/src/Application.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/Application.o"
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./Application.o"
   },
   {
     "arguments": [
       "/usr/bin/g++",
       "-c",
       "-o",
-      "obj/errors.o",
-      "errors.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/errors.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/errors.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/IndexBuffer.o",
-      "IndexBuffer.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/IndexBuffer.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/IndexBuffer.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/linalg.o",
-      "linalg.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/linalg.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/linalg.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/Renderer.o",
-      "Renderer.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/Renderer.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/Renderer.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/Shader.o",
-      "Shader.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/Shader.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/Shader.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/Texture.o",
-      "Texture.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/Texture.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/Texture.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/VertexArray.o",
-      "VertexArray.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/VertexArray.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/VertexArray.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/VertexBuffer.o",
-      "VertexBuffer.cpp",
-      "-I../lib",
-      "-I/usr/local/include"
-    ],
-    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/VertexBuffer.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/VertexBuffer.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/g++",
-      "-c",
-      "-o",
-      "obj/VertexBufferLayout.o",
+      "obj/./VertexBufferLayout.o",
       "VertexBufferLayout.cpp",
       "-I../lib",
+      "-I../lib/spdlog/include",
       "-I/usr/local/include"
     ],
     "directory": "/home/tkanas/Studies/Grafika/graphX/src",
     "file": "/home/tkanas/Studies/Grafika/graphX/src/VertexBufferLayout.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/VertexBufferLayout.o"
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./VertexBufferLayout.o"
   },
   {
     "arguments": [
       "/usr/bin/g++",
       "-c",
       "-o",
-      "obj/tests/TestBatch2D.o",
-      "tests/TestBatch2D.cpp",
+      "obj/./algebra.o",
+      "algebra.cpp",
       "-I../lib",
+      "-I../lib/spdlog/include",
       "-I/usr/local/include"
     ],
     "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/tests/TestBatch2D.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/tests/TestBatch2D.o"
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/algebra.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./algebra.o"
   },
   {
     "arguments": [
       "/usr/bin/g++",
       "-c",
       "-o",
-      "obj/tests/TestClearColor.o",
-      "tests/TestClearColor.cpp",
+      "obj/./VertexBuffer.o",
+      "VertexBuffer.cpp",
       "-I../lib",
+      "-I../lib/spdlog/include",
       "-I/usr/local/include"
     ],
     "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/tests/TestClearColor.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/tests/TestClearColor.o"
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/VertexBuffer.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./VertexBuffer.o"
   },
   {
     "arguments": [
       "/usr/bin/g++",
       "-c",
       "-o",
-      "obj/tests/Test.o",
-      "tests/Test.cpp",
+      "obj/./IndexBuffer.o",
+      "IndexBuffer.cpp",
       "-I../lib",
+      "-I../lib/spdlog/include",
       "-I/usr/local/include"
     ],
     "directory": "/home/tkanas/Studies/Grafika/graphX/src",
-    "file": "/home/tkanas/Studies/Grafika/graphX/src/tests/Test.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/tests/Test.o"
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/IndexBuffer.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./IndexBuffer.o"
   },
   {
     "arguments": [
       "/usr/bin/g++",
       "-c",
       "-o",
-      "obj/tests/TestTexture2D.o",
+      "obj/./Renderer.o",
+      "Renderer.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/Renderer.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./Renderer.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./Texture.o",
+      "Texture.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/Texture.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./Texture.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./util/Log.o",
+      "util/Log.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/util/Log.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./util/Log.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./tests/TestTexture2D.o",
       "tests/TestTexture2D.cpp",
       "-I../lib",
+      "-I../lib/spdlog/include",
       "-I/usr/local/include"
     ],
     "directory": "/home/tkanas/Studies/Grafika/graphX/src",
     "file": "/home/tkanas/Studies/Grafika/graphX/src/tests/TestTexture2D.cpp",
-    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/tests/TestTexture2D.o"
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./tests/TestTexture2D.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./tests/Test.o",
+      "tests/Test.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/tests/Test.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./tests/Test.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./tests/TestClearColor.o",
+      "tests/TestClearColor.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/tests/TestClearColor.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./tests/TestClearColor.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./tests/TestBatch2D.o",
+      "tests/TestBatch2D.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/tests/TestBatch2D.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./tests/TestBatch2D.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./linalg.o",
+      "linalg.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/linalg.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./linalg.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./Shader.o",
+      "Shader.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/Shader.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./Shader.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./errors.o",
+      "errors.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/errors.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./errors.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-o",
+      "obj/./VertexArray.o",
+      "VertexArray.cpp",
+      "-I../lib",
+      "-I../lib/spdlog/include",
+      "-I/usr/local/include"
+    ],
+    "directory": "/home/tkanas/Studies/Grafika/graphX/src",
+    "file": "/home/tkanas/Studies/Grafika/graphX/src/VertexArray.cpp",
+    "output": "/home/tkanas/Studies/Grafika/graphX/src/obj/./VertexArray.o"
   }
 ]

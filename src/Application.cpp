@@ -1,5 +1,3 @@
-#include <iostream>
-#include <cstdio>
 #include <cstdlib>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -7,6 +5,7 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include "Window.h"
 #include "IndexBuffer.h"
 #include "Renderer.h"
 #include "Shader.h"
@@ -16,66 +15,64 @@
 #include "VertexBufferLayout.h"
 #include "linalg.h"
 #include "errors.h"
+#include "utils/Log.h"
+#include "Event.h"
 
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture2D.h"
 #include "tests/TestBatch2D.h"
 
-static void error_callback(int error, const char* description)
+// F will be deduced by the compiler
+template <typename T, typename E, typename F>
+bool Dispatch(E event, const F& func)
 {
-    std::cerr << "Error: " << description << std::endl;
+    if (std::is_base_of<T, E>::value) {
+        event.handled = func(static_cast<T&>(event));
+        return true;
+    }
+    return false;
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action,
-    int mods)
+static bool shouldClose = false;
+
+static bool keyCallback(KeyEvent event)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    if (event.getKey() == GLFW_KEY_ESCAPE && event.getAction() == KeyEvent::Action::PRESS) {
+        shouldClose = true;
+        return true;
     }
+    return false;
+}
+
+static bool windowClosedCallback(WindowCloseEvent event)
+{
+    shouldClose = true;
+    return true;
+}
+
+static void eventCallback(Event event)
+{
+    Dispatch<KeyEvent>(event, keyCallback);
+    Dispatch<WindowCloseEvent>(event, windowClosedCallback);
 }
 
 int main(int argc, char* argv[])
 {
-    if (!glfwInit()) {
-        std::cerr << "GLFW initialization failed!\n";
-        return 1;
-    }
-    glfwSetErrorCallback(error_callback);
+    Log::init();
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    const float WIDTH = 640;
-    const float HEIGHT = 480;
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "My Title", NULL, NULL);
-    if (!window) {
-        std::cerr << "Window or OpenGL context creation failed!\n";
-        glfwTerminate();
-        return 1;
-    }
-    glfwMakeContextCurrent(window);
-    if (!gladLoadGL()) {
-        fprintf(stderr, "Glad failed to load OpenGL!\n");
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        return 1;
-    }
-    glfwSwapInterval(1);
-    glfwSetKeyCallback(window, key_callback);
-
-    printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),
-        glGetString(GL_SHADING_LANGUAGE_VERSION));
+    const float WIDTH = 1024;
+    const float HEIGHT = 768;
+    Window window("graphX", WIDTH, HEIGHT, eventCallback);
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(GLDebugMessageCallback, NULL);
 
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 420");
+    ImGui_ImplGlfw_InitForOpenGL(window.getNativeWindow(), true);
+    ImGui_ImplOpenGL3_Init(NULL);
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
     Renderer renderer;
@@ -90,7 +87,7 @@ int main(int argc, char* argv[])
     //currentTest = testMenu;
     currentTest = new test::TestBatch2D();
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!shouldClose) {
         renderer.clear();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -111,8 +108,7 @@ int main(int argc, char* argv[])
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window.onUpdate();
     }
 
     delete currentTest;
@@ -122,7 +118,6 @@ int main(int argc, char* argv[])
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }

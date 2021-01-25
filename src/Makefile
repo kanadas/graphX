@@ -2,8 +2,8 @@ ODIR		= obj
 LDIR 		= ../lib
 
 CC 			= g++
-CFLAGS 		:= -I$(LDIR) `pkg-config --cflags glfw3`
-VPATH 		= tests
+CFLAGS 		:= -I$(LDIR) -I$(LDIR)/spdlog/include `pkg-config --cflags glfw3`
+VPATH 		= tests util
 
 LIBFLAGS 	:= `pkg-config --static --libs glfw3`
 IMGUISRC 	= $(wildcard $(LDIR)/imgui/*.cpp)
@@ -11,10 +11,10 @@ IMGUI 		= $(patsubst %.cpp, %.o, $(IMGUISRC))
 _LIBS 		= glad/glad.o
 LIBS 		= $(patsubst %,$(LDIR)/%,$(_LIBS)) $(IMGUI)
 
-SOURCES 	= $(wildcard *.cpp) $(wildcard tests/*.cpp)
+SOURCES 	= $(shell find . -type f -name '*.cpp' -print) #$(wildcard *.cpp) $(wildcard tests/*.cpp)
 OBJ 		= $(patsubst %.cpp, $(ODIR)/%.o, $(SOURCES))
 #HEADERS 	= $(wildcard *.h) $(wildcard tests/*.h)
-DEPENDS 	:= $(patsubst %.cpp,%.d,$(SOURCES))
+DEPENDS 	:= $(patsubst %.cpp, $(ODIR)/%.d, $(SOURCES))
 
 -include $(DEPENDS)
 
