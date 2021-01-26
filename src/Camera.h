@@ -11,7 +11,9 @@ public:
     };
     Camera(Projection projection, float left, float right, float bottom, float top, float near, float far);
     Camera(Projection projection, float aspectRatio);
+    Camera(Projection projection);
     void setProjection(Projection projection, float left, float right, float bottom, float top, float near, float far);
+    void setProjection(Camera::Projection projection, float left, float right, float bottom, float top);
     vec3 getPosition() { return position; }
     void setPosition(vec3 pos)
     {
@@ -31,6 +33,8 @@ public:
     void onUpdate(float ts);
     void onEvent(Event& e);
 
+    float getAspectRatio() const { return aspectRatio; }
+
     float getZoomLevel() const { return zoomLevel; }
     void getZoomLevel(float level) { zoomLevel = level; }
 
@@ -46,15 +50,18 @@ private:
     float aspectRatio;
     float zoomLevel = 1.0f;
     float translationSpeed = 5.0f;
-    float rotationSpeed = 180.0f;
+    float rotationSpeed = 1.0f;
     float zoomSpeed = 0.25f;
     const float minZoom = 0.25f;
     const float maxZoom = 10.0f;
+    const float defaultNear = 1.0f;
+    const float defaultFar = 2.0f;
 
     void recalculateViewMatrix();
 
     bool onMouseScrolled(MouseScrolledEvent& e);
     bool onWindowResized(WindowResizeEvent& e);
+    bool onKey(KeyEvent& e);
 };
 
 #endif // __CAMERA_H_

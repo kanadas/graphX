@@ -23,6 +23,7 @@
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture2D.h"
 #include "tests/TestBatch2D.h"
+#include "tests/TestCamera.h"
 
 Application* Application::instance = nullptr;
 
@@ -39,14 +40,16 @@ Application::Application(const std::string name, uint32_t width, uint32_t height
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    Input::init();
+    Input::init(width, height);
 
+    TRACE("Initializing test menu");
     testMenu = new test::TestMenu(currentTest);
-    currentTest = new test::TestBatch2D();
+    currentTest = new test::TestCamera();
 
-    testMenu->registerTest<test::TestClearColor>("Clear Color");
-    testMenu->registerTest<test::TestTexture2D>("Texture 2D");
+    //testMenu->registerTest<test::TestClearColor>("Clear Color");
+    //testMenu->registerTest<test::TestTexture2D>("Texture 2D");
     testMenu->registerTest<test::TestBatch2D>("Batch 2D");
+    testMenu->registerTest<test::TestCamera>("Camera");
 
 }
 

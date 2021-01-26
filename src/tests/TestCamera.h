@@ -23,8 +23,8 @@ private:
     std::unique_ptr<Texture> textureA;
     std::unique_ptr<Texture> textureB;
     vec3 translation;
-    GLuint indexCount;
-    GLfloat size;
+    GLuint indexCount = 0;
+    GLfloat size = 0.2f;
 
     Camera camera;
 

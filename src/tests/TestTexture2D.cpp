@@ -11,7 +11,7 @@ TestTexture2D::TestTexture2D()
     , proj(mat4::Ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f))
     , view(mat4::Translation(0.0f, 0.0f, 0.0f))
 {
-    // Clang-format off
+    // clang-format off
     // position, texture pos
     float positions[] = {
         -50.0f, -50.0f, 0.0f, 0.0f, // 0

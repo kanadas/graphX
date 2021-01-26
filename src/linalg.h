@@ -53,6 +53,10 @@ struct vec4 {
     }
 };
 
+class NotInvertibleMatrixException {};
+
+struct LU4;
+
 struct mat4 {
     GLfloat arr[16];
     mat4();
@@ -60,6 +64,9 @@ struct mat4 {
     mat4(const mat4& m);
 
     mat4 transpose();
+    LU4 LUDecomp();
+    mat4 inverse();
+    mat4 inverseAffineIsometry();
 
     void operator+=(const mat4& m);
     mat4 operator+(const mat4& m);
@@ -154,6 +161,16 @@ struct mat4 {
         res.arr[11] = -1.0;
         return res;
     }
+};
+
+struct LU4 {
+    mat4 lu;
+    int p[3];
+
+    LU4();
+    LU4(mat4 lu, int p[]);
+
+    vec4 solve(const vec4& v);
 };
 
 #endif // __LINALG_H_

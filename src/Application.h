@@ -14,7 +14,7 @@ public:
     void onEvent(Event& event);
     void close();
 
-    inline Window& GetWindow() { return *window; }
+    inline Window& getWindow() { return *window; }
     inline static Application& Get() { return *instance; }
 private:
     Application(const std::string name, uint32_t width, uint32_t height);
