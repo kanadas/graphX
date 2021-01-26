@@ -3,6 +3,7 @@
 
 #include "glad/glad.h"
 #include <cstring>
+#include <cmath>
 
 struct vec3 {
     GLfloat arr[3];
@@ -14,6 +15,10 @@ struct vec3 {
     void operator+=(const vec3& m);
     vec3 operator+(const vec3& m);
     GLfloat operator*(const vec3& m); //Dot product
+    vec3 operator*(float f);
+
+    float norm();
+    float norm2();
 };
 
 struct vec4 {
@@ -26,6 +31,10 @@ struct vec4 {
     void operator+=(const vec4& m);
     vec4 operator+(const vec4& m);
     GLfloat operator*(const vec4& m); //Dot product
+    vec4 operator*(float f);
+
+    float norm();
+    float norm2();
 
     static vec4 point(const vec3& v)
     {
@@ -79,6 +88,34 @@ struct mat4 {
     static mat4 Translation(const vec3& v)
     {
         return Translation(v.arr[0], v.arr[1], v.arr[2]);
+    }
+
+    static mat4 Rotation(vec3 axis, float phi)
+    {
+        float l, s, c, c1;
+        mat4 res = Ident();
+        l = 1.0 / axis.norm();
+        axis = axis * l;
+        s = sin(phi);
+        c = cos(phi);
+        c1 = 1.0 - c;
+        float x = axis.arr[0], y = axis.arr[1], z = axis.arr[2];
+        res.arr[0] = x * x * c1 + c;
+        res.arr[1] = x * y * c1;
+        res.arr[4] = x * y * c1;
+        res.arr[5] = y * y * c1 + c;
+        res.arr[2]  = x * z * c1;
+        res.arr[8] = x * z * c1;
+        res.arr[6] = y * z * c1;
+        res.arr[9] = y * z * c1;
+        res.arr[10] = z * z * c1 + c;
+        res.arr[6] += s * x;
+        res.arr[2] -= s * y;
+        res.arr[1] += s * z;
+        res.arr[9] -= s * x;
+        res.arr[8] += s * y;
+        res.arr[4] -= s * z;
+        return res;
     }
 
     static mat4 Ortho(float left, float right, float bottom, float top, float near, float far)

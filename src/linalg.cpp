@@ -1,6 +1,8 @@
 #include "linalg.h"
 #include <cstring>
 
+#include <cmath>
+
 vec3::vec3()
 {
 }
@@ -39,6 +41,21 @@ vec3 vec3::operator+(const vec3& m)
 GLfloat vec3::operator*(const vec3& m) //Dot product
 {
     return arr[0] * m.arr[0] + arr[1] * m.arr[1] + arr[2] * m.arr[2];
+}
+
+vec3 vec3::operator*(float f)
+{
+    return vec3(f * arr[0], f * arr[1], f* arr[2]);
+}
+
+float vec3::norm()
+{
+    return sqrt(arr[0] * arr[0] + arr[1] * arr[1] + arr[2] * arr[2]);
+}
+
+float vec3::norm2()
+{
+    return arr[0] * arr[0] + arr[1] * arr[1] + arr[2] * arr[2];
 }
 
 vec4::vec4()
@@ -81,6 +98,21 @@ vec4 vec4::operator+(const vec4& m)
 GLfloat vec4::operator*(const vec4& m) //Dot product
 {
     return arr[0] * m.arr[0] + arr[1] * m.arr[1] + arr[2] * m.arr[2] + arr[3] * m.arr[3];
+}
+
+vec4 vec4::operator*(float f)
+{
+    return vec4(f * arr[0], f * arr[1], f * arr[2], f * arr[3]);
+}
+
+float vec4::norm()
+{
+    return sqrt(arr[0] * arr[0] + arr[1] * arr[1] + arr[2] * arr[2] + arr[3] * arr[3]);
+}
+
+float vec4::norm2()
+{
+    return arr[0] * arr[0] + arr[1] * arr[1] + arr[2] * arr[2] + arr[3] * arr[3];
 }
 
 #define IND4(i, j) ((i) + 4 * (j))

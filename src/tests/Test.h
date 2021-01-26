@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include "../utils/Log.h"
+#include "../Event.h"
 
 namespace test {
 
@@ -16,6 +17,7 @@ public:
     virtual void onUpdate(float deltaTime) { }
     virtual void onRender() { }
     virtual void onImGuiRender() { }
+    virtual void onEvent(Event& e) { }
 };
 
 class TestMenu : public Test {

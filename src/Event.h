@@ -2,6 +2,7 @@
 #define __EVENT_H_
 
 #include <cstdint>
+#include <functional>
 
 #define EVENT_TYPE(type)                                   \
     virtual Type getType() const override { return type; } \
@@ -151,5 +152,7 @@ bool DispatchEvent(Event& event, const F& func)
     }
     return false;
 }
+
+#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 #endif // __EVENT_H_

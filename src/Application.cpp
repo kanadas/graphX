@@ -18,19 +18,18 @@
 #include "utils/errors.h"
 #include "utils/Log.h"
 #include "Event.h"
+#include "Input.h"
 
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture2D.h"
 #include "tests/TestBatch2D.h"
-
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 Application* Application::instance = nullptr;
 
 Application::Application(const std::string name, uint32_t width, uint32_t height)
 {
     TRACE("Creating Application {} {} {}", name, width, height);
-    window = std::make_unique<Window>(name, width, height, BIND_EVENT_FN(onEvent));
+    window = std::make_unique<Window>(name, width, height, BIND_EVENT_FN(Application::onEvent));
 
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
@@ -39,6 +38,8 @@ Application::Application(const std::string name, uint32_t width, uint32_t height
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
+
+    Input::init();
 
     testMenu = new test::TestMenu(currentTest);
     currentTest = new test::TestBatch2D();
@@ -123,7 +124,11 @@ bool Application::onWindowClose(WindowCloseEvent& e)
 void Application::onEvent(Event& event)
 {
     DispatchEvent<KeyEvent>(event, keyCallback);
-    DispatchEvent<WindowCloseEvent>(event, BIND_EVENT_FN(onWindowClose));
+    DispatchEvent<WindowCloseEvent>(event, BIND_EVENT_FN(Application::onWindowClose));
+    Input::onEvent(event);
+    if(currentTest) {
+        currentTest->onEvent(event);
+    }
 }
 
 void Application::close()
