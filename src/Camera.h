@@ -55,7 +55,7 @@ private:
     const float minZoom = 0.25f;
     const float maxZoom = 10.0f;
     const float defaultNear = 1.0f;
-    const float defaultFar = 2.0f;
+    const float defaultFar = 10.0f;
 
     void recalculateViewMatrix();
 
