@@ -5,36 +5,40 @@
 #include <cstring>
 #include <cmath>
 
+struct vec4;
+
 struct vec3 {
     GLfloat arr[3];
     vec3();
     vec3(const GLfloat arr[3]);
     vec3(GLfloat x, GLfloat y, GLfloat z);
     vec3(const vec3& v);
+    vec3(const vec4& v);
 
     void operator+=(const vec3& m);
-    vec3 operator+(const vec3& m);
-    GLfloat operator*(const vec3& m); //Dot product
-    vec3 operator*(float f);
+    vec3 operator+(const vec3& m) const;
+    GLfloat operator*(const vec3& m) const; //Dot product
+    vec3 operator*(float f) const;
 
-    float norm();
-    float norm2();
+    float norm() const;
+    float norm2() const;
+    vec3 cross(const vec3& v) const;
 };
 
 struct vec4 {
     GLfloat arr[4];
     vec4();
-    vec4(GLfloat arr[4]);
+    vec4(const GLfloat arr[4]);
     vec4(GLfloat x, GLfloat y, GLfloat z, GLfloat h);
     vec4(const vec4& v);
 
     void operator+=(const vec4& m);
-    vec4 operator+(const vec4& m);
-    GLfloat operator*(const vec4& m); //Dot product
-    vec4 operator*(float f);
+    vec4 operator+(const vec4& m) const;
+    GLfloat operator*(const vec4& m) const; //Dot product
+    vec4 operator*(float f) const;
 
-    float norm();
-    float norm2();
+    float norm() const;
+    float norm2() const;
 
     static vec4 point(const vec3& v)
     {
@@ -60,20 +64,20 @@ struct LU4;
 struct mat4 {
     GLfloat arr[16];
     mat4();
-    mat4(GLfloat arr[16]);
+    mat4(const GLfloat arr[16]);
     mat4(const mat4& m);
 
-    mat4 transpose();
-    LU4 LUDecomp();
-    mat4 inverse();
-    mat4 inverseAffineIsometry();
+    mat4 transpose() const;
+    LU4 LUDecomp() const;
+    mat4 inverse() const;
+    mat4 inverseAffineIsometry() const;
 
     void operator+=(const mat4& m);
-    mat4 operator+(const mat4& m);
+    mat4 operator+(const mat4& m) const;
     void operator*=(const mat4& m);
-    mat4 operator*(const mat4& m);
-    vec4 operator*(const vec4& v);
-    vec4 operator^(const vec4& v); //Transposed multiplication
+    mat4 operator*(const mat4& m) const;
+    vec4 operator*(const vec4& v) const;
+    vec4 operator^(const vec4& v) const; //Transposed multiplication
 
     static mat4 Ident()
     {
@@ -170,7 +174,26 @@ struct LU4 {
     LU4();
     LU4(mat4 lu, int p[]);
 
-    vec4 solve(const vec4& v);
+    vec4 solve(const vec4& v) const;
+};
+
+class ZeroRotationAxisException {};
+
+struct rot3 {
+    //TODO quaternion
+    vec3 axis;
+    float angle;
+
+    rot3() {}
+    rot3(const vec3& axis, float angle);
+
+    vec3 apply(const vec3& v) const;
+    rot3 compose(const rot3& r) const;
+    rot3 inverse() const;
+    mat4 toMatrix() const;
+
+    rot3 operator*(const rot3& r) const { return compose(r); }
+    vec3 operator*(const vec3& v) const { return apply(v); }
 };
 
 #endif // __LINALG_H_

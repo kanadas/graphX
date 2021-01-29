@@ -12,6 +12,7 @@ Camera::Camera(Camera::Projection projection, float left, float right, float bot
     TRACE("Creating camera aspect = {}, zoom = {}", aspectRatio, zoomLevel);
     setProjection(projection, left, right, bottom, top, near, far);
     recalculateViewMatrix();
+
 }
 
 Camera::Camera(Projection projection, float aspectRatio)
@@ -22,11 +23,15 @@ Camera::Camera(Projection projection, float aspectRatio)
     zoomLevel = 1.0f;
     setProjection(projection, -aspectRatio, aspectRatio, -1, 1);
     recalculateViewMatrix();
+    lastMouseX = Input::GetMouseX();
+    lastMouseY = Input::GetMouseY();
 }
 
 Camera::Camera(Projection projection)
     : Camera(projection, Input::GetWindowWidth() / Input::GetWindowHeight())
 {
+    lastMouseX = Input::GetMouseX();
+    lastMouseY = Input::GetMouseY();
 }
 
 void Camera::setProjection(Camera::Projection projection, float left, float right, float bottom, float top, float near, float far)
@@ -49,9 +54,18 @@ void Camera::setProjection(Camera::Projection projection, float left, float righ
 
 void Camera::recalculateViewMatrix()
 {
+    /*
     mat4 transform =  mat4::Translation(position) * mat4::Rotation(vec3(0, 0, 1), rotation);
     viewMatrix = transform.inverseAffineIsometry();
+    */
+    viewMatrix = mat4::Translation(position * -1) * rotation.inverse().toMatrix();
     viewProjectionMatrix = projectionMatrix * viewMatrix;
+}
+
+void Camera::updateRotation(vec3 axis, float delta_angle)
+{
+    rot3 nrot(rotation * axis, delta_angle);
+    rotation = rotation.compose(nrot);
 }
 
 void Camera::onUpdate(float ts)
@@ -62,28 +76,63 @@ void Camera::onUpdate(float ts)
     if (Input::IsKeyPressed(GLFW_KEY_S)) {
         position.arr[1] -= translationSpeed * ts;
     }
-    if (Input::IsKeyPressed(GLFW_KEY_D)) {
+    if (Input::IsKeyPressed(GLFW_KEY_W)) {
         position.arr[1] += translationSpeed * ts;
     }
-    if (Input::IsKeyPressed(GLFW_KEY_F)) {
+    if (Input::IsKeyPressed(GLFW_KEY_D)) {
         position.arr[0] += translationSpeed * ts;
     }
-    if (Input::IsKeyPressed(GLFW_KEY_Z)) {
+    if (Input::IsKeyPressed(GLFW_KEY_Q)) {
         position.arr[2] -= translationSpeed * ts;
     }
-    if (Input::IsKeyPressed(GLFW_KEY_X)) {
+    if (Input::IsKeyPressed(GLFW_KEY_E)) {
         position.arr[2] += translationSpeed * ts;
     }
-    if (Input::IsKeyPressed(GLFW_KEY_Q)) {
-        rotation -= rotationSpeed * ts;
+    if (Input::IsKeyPressed(GLFW_KEY_F)) {
+        zoomLevel += ts * zoomSpeed;
+        zoomLevel = std::min(std::max(zoomLevel, minZoom), maxZoom);
+        setProjection(projection, -aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
     }
     if (Input::IsKeyPressed(GLFW_KEY_R)) {
-        rotation += rotationSpeed * ts;
+        zoomLevel -= ts * zoomSpeed;
+        zoomLevel = std::min(std::max(zoomLevel, minZoom), maxZoom);
+        setProjection(projection, -aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
     }
-    if (rotation > 180) {
-        rotation -= 180;
-    } else if (rotation < -180) {
-        rotation += 180;
+    if (Input::IsKeyPressed(GLFW_KEY_L)) {
+        vec3 axis(0,1,0);
+        updateRotation(vec3(0,1,0), -rotationSpeed * ts);
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_J)) {
+        updateRotation(vec3(0,1,0), rotationSpeed * ts);
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_I)) {
+        updateRotation(vec3(1,0,0), -rotationSpeed * ts);
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_K)) {
+        updateRotation(vec3(1,0,0), rotationSpeed * ts);
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_U)) {
+        updateRotation(vec3(0,0,1), -rotationSpeed * ts);
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_O)) {
+        updateRotation(vec3(0,0,1), rotationSpeed * ts);
+    }
+
+    float mouseX = Input::GetMouseX();
+    float mouseY = Input::GetMouseY();
+    float dX = lastMouseX - mouseX;
+    float dY = lastMouseY - mouseY;
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+    if (dX != 0 || dY != 0) {
+        dX = dX * 2 * aspectRatio * zoomLevel / Input::GetWindowWidth();
+        dY = dY * 2 * zoomLevel / Input::GetWindowHeight();
+        if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ) {
+            position.arr[0] += dX;
+            position.arr[1] -= dY;
+        } else if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+            updateRotation(vec3(dY, dX, 0), rotationSpeed * ts);
+        }
     }
 
     recalculateViewMatrix();

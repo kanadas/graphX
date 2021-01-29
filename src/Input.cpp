@@ -54,7 +54,7 @@ bool Input::onMouseButton(MouseButtonEvent& e)
 bool Input::onMouseMoved(MouseMovedEvent& e)
 {
     mousePosX = e.getXPos();
-    mousePosY = e.getXPos();
+    mousePosY = e.getYPos();
     return false;
 }
 

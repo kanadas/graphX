@@ -9,21 +9,18 @@ public:
         Ortographic,
         Perspective
     };
-    Camera(Projection projection, float left, float right, float bottom, float top, float near, float far);
     Camera(Projection projection, float aspectRatio);
     Camera(Projection projection);
-    void setProjection(Projection projection, float left, float right, float bottom, float top, float near, float far);
-    void setProjection(Camera::Projection projection, float left, float right, float bottom, float top);
     vec3 getPosition() { return position; }
     void setPosition(vec3 pos)
     {
         position = pos;
         recalculateViewMatrix();
     }
-    float getRotation() { return rotation; }
-    void setRotation(float rot)
+    rot3 getRotation() { return rotation; }
+    void setRotation(rot3 rotation)
     {
-        rotation = rot;
+        this->rotation = rotation;
         recalculateViewMatrix();
     }
     mat4 getProjectionMatrix() { return projectionMatrix; }
@@ -45,19 +42,26 @@ private:
     mat4 viewProjectionMatrix;
 
     vec3 position = { 0.0f, 0.0f, 0.0f };
-    float rotation = 0.0f; //TODO quaternion
+    rot3 rotation = {{ 1.0f, 0.0f, 0.0f }, 0.0f};
 
     float aspectRatio;
     float zoomLevel = 1.0f;
     float translationSpeed = 5.0f;
-    float rotationSpeed = 1.0f;
+    float rotationSpeed = 2.0f;
+    float mouseRotationSpeed = 0.5f;
     float zoomSpeed = 0.25f;
     const float minZoom = 0.25f;
     const float maxZoom = 10.0f;
     const float defaultNear = 1.0f;
     const float defaultFar = 10.0f;
+    float lastMouseX, lastMouseY;
+
+    Camera(Projection projection, float left, float right, float bottom, float top, float near, float far);
+    void setProjection(Projection projection, float left, float right, float bottom, float top, float near, float far);
+    void setProjection(Projection projection, float left, float right, float bottom, float top);
 
     void recalculateViewMatrix();
+    void updateRotation(vec3 axis, float delta_angle);
 
     bool onMouseScrolled(MouseScrolledEvent& e);
     bool onWindowResized(WindowResizeEvent& e);

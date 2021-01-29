@@ -73,14 +73,15 @@ static void writeQuad(vertex* buff, vec3 pos, float size, vec4 color, GLint text
 }
 
 Test3D::Test3D()
-    : translation(vec3(0, 0, 0))
+    : translationCube(vec3(-2 * size, 0, 0))
+    , translationTetra(vec3(2 * size, 0, 0))
     , camera(Camera::Projection::Ortographic)
 {
     TRACE("Creating 3D test");
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    GLuint indices[12*3] = {
+    GLuint cube_indices[12*3] = {
         0, 1, 2, 2, 3, 0,
         4, 5, 6, 6, 7, 4,
         0, 1, 5, 5, 4, 0,
@@ -89,8 +90,16 @@ Test3D::Test3D()
         3, 0, 4, 4, 7, 3,
     };
 
+    GLuint tetrahedron_indices[4*3] = {
+        1, 3, 4,
+        1, 6, 4,
+        3, 4, 6,
+        3, 1, 6,
+    };
+
     VAO = std::make_unique<VertexArray>();
-    indexBuffer = std::make_unique<IndexBuffer>((GLuint*)indices, 12*3);
+    indexBufferCube = std::make_unique<IndexBuffer>((GLuint*)cube_indices, 12*3);
+    indexBufferTetra = std::make_unique<IndexBuffer>((GLuint*)tetrahedron_indices, 4*3);
     vertexBuffer = std::make_unique<VertexBuffer>(nullptr, MaxVertexCount * sizeof(vertex), GL_DYNAMIC_DRAW);
     VertexBufferLayout layout;
     vertex::createLayout(layout);
@@ -133,18 +142,24 @@ void Test3D::onRender()
 
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
-    mat4 model = mat4::Translation(translation.arr);
-    mat4 mvp = camera.getViewProjectionMatrix() * model;
+    mat4 model_cube = mat4::Translation(translationCube.arr);
+    mat4 model_tetra = mat4::Translation(translationTetra.arr);
 
     shader->bind();
+    mat4 mvp = camera.getViewProjectionMatrix() * model_cube;
     shader->setUniformMat4f("u_MVP", mvp.arr);
-    renderer.draw(*VAO, *indexBuffer, *shader, 12 * 3);
+    renderer.draw(*VAO, *indexBufferCube, *shader, 12 * 3);
+
+    mvp = camera.getViewProjectionMatrix() * model_tetra;
+    shader->setUniformMat4f("u_MVP", mvp.arr);
+    renderer.draw(*VAO, *indexBufferTetra, *shader, 4 * 3);
 }
 
 void Test3D::onImGuiRender()
 {
-    ImGui::DragFloat2("Checkboard position", translation.arr, 0.1f);
-    ImGui::DragFloat("Checkboard size", &size, 0.05f);
+    ImGui::DragFloat2("Cube position", translationCube.arr, 0.1f);
+    ImGui::DragFloat2("Tetrahedron position", translationTetra.arr, 0.1f);
+    ImGui::DragFloat("Model size", &size, 0.05f);
     vec3 position = camera.getPosition();
     ImGui::Text("Camera: position = (%.1f, %.1f, %.1f), rotation = %.3f, aspect = %.3f, zoom = %.1f", position.arr[0], position.arr[1], position.arr[2], camera.getRotation(), camera.getAspectRatio(), camera.getZoomLevel());
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

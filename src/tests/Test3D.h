@@ -17,14 +17,16 @@ namespace test {
 class Test3D : public Test {
 private:
     std::unique_ptr<VertexArray> VAO;
-    std::unique_ptr<IndexBuffer> indexBuffer;
+    std::unique_ptr<IndexBuffer> indexBufferCube;
+    std::unique_ptr<IndexBuffer> indexBufferTetra;
     std::unique_ptr<VertexBuffer> vertexBuffer;
     std::unique_ptr<Shader> shader;
     std::unique_ptr<Texture> textureA;
     std::unique_ptr<Texture> textureB;
-    vec3 translation;
-    GLuint indexCount = 12 * 3;
     GLfloat size = 0.2f;
+    vec3 translationCube;
+    vec3 translationTetra;
+    GLuint indexCount = 12 * 3;
 
     Camera camera;
 
