@@ -18,6 +18,7 @@ public:
     vec4 getAmbient() { return ambient; }
     vec4 getDirect() { return direct; }
     vec4 getPosition() { return position; }
+    vec4& getPositionRef() { return position; }
 
     virtual std::vector<std::string> getNames() const override;
     virtual void set() const override;

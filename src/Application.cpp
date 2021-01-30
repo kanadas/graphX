@@ -20,6 +20,7 @@
 #include "Event.h"
 #include "Input.h"
 
+#include "tests/TestImGui.h"
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture2D.h"
 #include "tests/TestBatch2D.h"
@@ -48,6 +49,7 @@ Application::Application(const std::string name, uint32_t width, uint32_t height
     testMenu = new test::TestMenu(currentTest);
     currentTest = new test::TestLight();
 
+    testMenu->registerTest<test::TestImGui>("ImGui");
     //testMenu->registerTest<test::TestClearColor>("Clear Color");
     //testMenu->registerTest<test::TestTexture2D>("Texture 2D");
     testMenu->registerTest<test::TestBatch2D>("Batch 2D");

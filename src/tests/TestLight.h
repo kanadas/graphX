@@ -24,7 +24,7 @@ public:
     LightBlock(std::string name, GLuint program, const std::vector<Light>& lights);
     ~LightBlock();
     void addLight(Light light);
-    const std::vector<Light>& getSource() { return source; }
+    std::vector<Light>& getSource() { return source; }
 
     virtual std::vector<std::string> getNames() const override;
     virtual void set() const override;
@@ -50,11 +50,12 @@ private:
     vec3 translationCube;
     vec3 translationTetra;
     GLuint indexCount = 12 * 3;
+    bool infDistLight[LightBlock::MAX_NLIGHTS] = { true };
 
     Camera camera;
     std::unique_ptr<LightBlock> lights;
-    vec4 defaultAmbient = { 0.2, 0.2, 0.3, 1.0 };
-    vec4 defaultDirect = { 0.8, 0.8, 0.8, 1.0 };
+    vec4 defaultAmbient = { 0.1, 0.1, 0.1, 1.0 };
+    vec4 defaultDirect = { 0.4, 0.4, 0.4, 1.0 };
     vec4 defaultLightPosition = { 0.0, 1.0, 1.0, 0.0 }; //infinetely far
 
     const GLuint MaxQuadCount = 1000;

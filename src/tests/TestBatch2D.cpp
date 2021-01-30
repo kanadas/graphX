@@ -50,7 +50,8 @@ static void writeQuad(vertex* buff, GLfloat x, GLfloat y, float size, vec4 color
 }
 
 TestBatch2D::TestBatch2D()
-    : translation(vec3(100, 100, 0))
+    : Test("Batch 2D Test")
+    , translation(vec3(100, 100, 0))
     //, positions { { -50, -50 }, { 100, -50 }, { 250, -50 } }
     , proj(mat4::Ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f))
     , view(mat4::Translation(0.0f, 0.0f, 0.0f))

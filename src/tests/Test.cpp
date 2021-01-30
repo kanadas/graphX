@@ -4,7 +4,8 @@
 namespace test {
 
 TestMenu::TestMenu(Test*& currentTest)
-    : currentTest(currentTest)
+    : Test("Test Menu")
+    , currentTest(currentTest)
 {
 }
 

@@ -73,7 +73,8 @@ static void writeQuad(vertex* buff, vec3 pos, float size, vec4 color, GLint text
 }
 
 TestCamera::TestCamera()
-    : translation(vec3(0, 0, 0))
+    : Test("Camera Test")
+    , translation(vec3(0, 0, 0))
     , camera(Camera::Projection::Ortographic)
 {
     TRACE("Creating camera test");

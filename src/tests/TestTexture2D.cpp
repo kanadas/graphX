@@ -6,7 +6,8 @@
 namespace test {
 
 TestTexture2D::TestTexture2D()
-    : translationA(200, 200, 0)
+    : Test("Texture 2D Test")
+    , translationA(200, 200, 0)
     , translationB(400, 200, 0)
     , proj(mat4::Ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f))
     , view(mat4::Translation(0.0f, 0.0f, 0.0f))

@@ -30,10 +30,10 @@ void Input::onEventImpl(Event& e)
 bool Input::onKey(KeyEvent& e)
 {
     if (e.getAction() == KeyEvent::Action::PRESS) {
-        TRACE("Pressed key {}", e.getKey());
+        //TRACE("Pressed key {}", e.getKey());
         pressedKeys.insert(e.getKey());
     } else if (e.getAction() == KeyEvent::Action::RELEASE) {
-        TRACE("Released key {}", e.getKey());
+        //TRACE("Released key {}", e.getKey());
         pressedKeys.erase(e.getKey());
     }
     return false;
@@ -42,10 +42,10 @@ bool Input::onKey(KeyEvent& e)
 bool Input::onMouseButton(MouseButtonEvent& e)
 {
     if (e.getAction() == MouseButtonEvent::Action::PRESS) {
-        TRACE("Pressed mouse {}", e.getButton());
+        //TRACE("Pressed mouse {}", e.getButton());
         pressedMouseButtons.insert(e.getButton());
     } else if (e.getAction() == MouseButtonEvent::Action::RELEASE) {
-        TRACE("Released mouse {}", e.getButton());
+        //TRACE("Released mouse {}", e.getButton());
         pressedMouseButtons.erase(e.getButton());
     }
     return false;

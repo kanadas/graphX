@@ -4,6 +4,7 @@
 #include "../Renderer.h"
 
 #include <numeric>
+#include <sstream>
 
 namespace test {
 
@@ -35,6 +36,7 @@ void LightBlock::addLight(Light light)
         throw new TooManyLightsException();
     }
     source.push_back(light);
+    source[source.size() - 1].copyOffsets(source[0], (source.size() - 1) * lightStride);
 }
 
 std::vector<std::string> LightBlock::getNames() const
@@ -84,7 +86,8 @@ void TestLight::writeQuad(vertex* buff, vec3 pos, float size, vec4 color)
 }
 
 TestLight::TestLight()
-    : translationCube(vec3(-2 * size, 0, 0))
+    : Test("Light Test")
+    , translationCube(vec3(-2 * size, 0, 0))
     , translationTetra(vec3(2 * size, 0, 0))
     , camera(Camera::Projection::Perspective)
 {
@@ -174,11 +177,41 @@ void TestLight::onRender()
 
 void TestLight::onImGuiRender()
 {
-    ImGui::DragFloat2("Cube position", translationCube.arr, 0.1f);
-    ImGui::DragFloat2("Tetrahedron position", translationTetra.arr, 0.1f);
-    ImGui::DragFloat("Model size", &size, 0.05f);
-    vec3 position = camera.getPosition();
-    ImGui::Text("Camera: position = (%.1f, %.1f, %.1f), rotation = %.3f, aspect = %.3f, zoom = %.1f", position.arr[0], position.arr[1], position.arr[2], camera.getRotation(), camera.getAspectRatio(), camera.getZoomLevel());
+    if (ImGui::BeginTabBar("Controls")) {
+        if (ImGui::BeginTabItem("Objects")) {
+            ImGui::DragFloat2("Cube position", translationCube.arr, 0.1f);
+            ImGui::DragFloat2("Tetrahedron position", translationTetra.arr, 0.1f);
+            ImGui::DragFloat("Model size", &size, 0.05f);
+            vec3 position = camera.getPosition();
+            ImGui::Text("Camera: position = (%.1f, %.1f, %.1f), aspect = %.3f, zoom = %.1f",
+                position.arr[0], position.arr[1], position.arr[2],
+                camera.getAspectRatio(), camera.getZoomLevel());
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Lights")) {
+            if (ImGui::Button("Create")) {
+                Light light(defaultAmbient, defaultDirect, defaultLightPosition);
+                lights->addLight(light);
+            }
+            std::vector<Light>& source = lights->getSource();
+            for (int i = 0; i < source.size(); i++) {
+                ImGui::PushID(i);
+                std::ostringstream name;
+                name << "Light " << i << " position";
+                ImGui::DragFloat3(name.str().c_str(), source[i].getPositionRef().arr, 0.1);
+                ImGui::SameLine();
+                ImGui::Checkbox("Inf dist", &(infDistLight[i]));
+                if (infDistLight[i]) {
+                    source[i].getPositionRef().arr[3] = 0;
+                } else {
+                    source[i].getPositionRef().arr[3] = 1;
+                }
+                ImGui::PopID();
+            }
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
 

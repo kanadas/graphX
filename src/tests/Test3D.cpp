@@ -73,7 +73,8 @@ static void writeQuad(vertex* buff, vec3 pos, float size, vec4 color, GLint text
 }
 
 Test3D::Test3D()
-    : translationCube(vec3(-2 * size, 0, 0))
+    : Test("3D Test")
+    , translationCube(vec3(-2 * size, 0, 0))
     , translationTetra(vec3(2 * size, 0, 0))
     , camera(Camera::Projection::Ortographic)
 {

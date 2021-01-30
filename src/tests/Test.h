@@ -11,13 +11,17 @@ namespace test {
 
 class Test {
 public:
-    Test() { }
+    Test(std::string name) : name(name) { }
     virtual ~Test() { }
+
+    std::string getName() { return name; }
 
     virtual void onUpdate(float deltaTime) { }
     virtual void onRender() { }
     virtual void onImGuiRender() { }
     virtual void onEvent(Event& e) { }
+private:
+    std::string name;
 };
 
 class TestMenu : public Test {
