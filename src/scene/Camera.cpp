@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "Input.h"
 #include "utils/Log.h"
+#include <imgui/imgui.h>
 
 Camera::Camera(Camera::Projection projection, float left, float right, float bottom, float top, float near, float far)
     : projection(projection)
@@ -119,7 +120,7 @@ void Camera::onUpdate(float ts)
     float dY = lastMouseY - mouseY;
     lastMouseX = mouseX;
     lastMouseY = mouseY;
-    if (dX != 0 || dY != 0) {
+    if (!Input::IsImGuiWindowHovered() && (dX != 0 || dY != 0)) {
         dX = dX * 2 * aspectRatio * zoomLevel / Input::GetWindowWidth();
         dY = dY * 2 * zoomLevel / Input::GetWindowHeight();
         if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ) {

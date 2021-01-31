@@ -8,6 +8,7 @@
 #include "buffers/VertexBufferLayout.h"
 #include "buffers/VertexArray.h"
 #include "buffers/IndexBuffer.h"
+#include "buffers/UniformBlock.h"
 #include "Shader.h"
 #include "Event.h"
 #include "scene/Camera.h"

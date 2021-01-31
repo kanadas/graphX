@@ -19,9 +19,10 @@ class IndexOutOfBoundsException {
 template <class VertexT>
 class Model {
 public:
-    Model()
-        : translation(0, 0, 0)
-        , rotation({ 1, 0, 0 }, 0)
+    Model(std::string name)
+        : name(name)
+        , translation(0, 0, 0)
+        , rotationPerAxis(0, 0, 0)
     {
         VAO = std::make_unique<VertexArray>();
         indexBuffer = std::make_unique<IndexBuffer>(nullptr, maxIndexCount, GL_DYNAMIC_DRAW);
@@ -32,7 +33,7 @@ public:
     }
 
     //Result is viable till next vertex addition / deletion
-    VertexT getVertex(int idx) const
+    VertexT getVertex(int idx)
     {
         if (idx >= nVertices) {
             throw new IndexOutOfBoundsException();
@@ -42,8 +43,18 @@ public:
 
     const std::vector<GLuint>& getIndices() const { return indices; }
     vec3& getTranslation() { return translation; }
-    rot3& getRotation() { return rotation; }
-    mat4 getTransform() { return rotation.toMatrix() * mat4::Translation(translation); }
+    vec3& getRotationPerAxis() { return rotationPerAxis; }
+    void setTranslation(const vec3& t) { translation = t; }
+    void setRotationPerAxis(const vec3& r) { rotationPerAxis = r; }
+    mat4 getTransform() const
+    {
+        rot3 rotation = rot3(vec3(1,0,0), rotationPerAxis.arr[0]) *
+            rot3(vec3(0,1,0), rotationPerAxis.arr[1]) *
+            rot3(vec3(0,0,1), rotationPerAxis.arr[2]);
+        return mat4::Translation(translation) * rotation.toMatrix();
+    }
+    const std::string& getName() const { return name; }
+    uint32_t getNVertices() const { return nVertices; }
 
     void addVertex(std::array<uint8_t, VertexT::size()> data)
     {
@@ -99,7 +110,8 @@ private:
     std::vector<uint8_t> buff;
     std::vector<GLuint> indices;
     vec3 translation;
-    rot3 rotation;
+    vec3 rotationPerAxis;
+    std::string name;
 
     uint32_t maxVertexCount = 100;
     uint32_t maxIndexCount = 200;

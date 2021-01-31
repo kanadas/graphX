@@ -103,12 +103,13 @@ TestDrawFlat::TestDrawFlat()
     };
     // clang-format on
 
-    models.push_back(Model<Vertex>());
-    writeQuad(0, vec3(-0.7, -0.2, 0), 0.4, vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    writeQuad(0, vec3(-0.7, -0.2, -0.4), 0.4, vec4(0.0f, 0.0f, 1.0f, 1.0f));
+    models.push_back(Model<Vertex>("Cube"));
+    writeQuad(0, vec3(-0.2, -0.2, 0.2), 0.4, vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    writeQuad(0, vec3(-0.2, -0.2, -0.2), 0.4, vec4(0.0f, 0.0f, 1.0f, 1.0f));
     for (int i = 0; i < 12*3; i++) {
         models[0].addIndex(cube_indices[i]);
     }
+    //models[0].setTranslation(vec3(-0.5, 0, 0));
 
     shader = std::make_unique<Shader>("shaders/testLight.glsl.vert", "shaders/testLight.glsl.geom", "shaders/testLight.glsl.frag");
     shader->bind();
@@ -132,17 +133,17 @@ void TestDrawFlat::onUpdate(float deltatime)
 void TestDrawFlat::onRender()
 {
     Renderer renderer;
-    vec4 eyepos = vec4::point(camera.getPosition());
     mat4 model = mat4::Translation(translation.arr);
-    mat4 MVPTransform = camera.getViewProjectionMatrix() * model;
+    vec4 eyepos = vec4::point(camera.getPosition() + translation * -1);
 
     shader->bind();
     shader->setUniform4f("eyepos", eyepos.arr);
-    shader->setUniformMat4f("MVPTransform", MVPTransform.arr);
     lights->set();
     for (int i = 0; i < models.size(); i++) {
-        mat4 modelTransform = models[i].getTransform() * model;
+        mat4 modelTransform = model * models[i].getTransform();
+        mat4 MVPTransform = camera.getViewProjectionMatrix() * modelTransform;
         shader->setUniformMat4f("ModelTransform", modelTransform.arr);
+        shader->setUniformMat4f("MVPTransform", MVPTransform.arr);
         models[i].draw(shader);
     }
 }
@@ -153,9 +154,30 @@ void TestDrawFlat::onImGuiRender()
         if (ImGui::BeginTabItem("Flat Models")) {
             if (ImGui::CollapsingHeader("New Model"))
             {
-                //ImGui::Text("IsItemHovered: %d", ImGui::IsItemHovered());
             }
-            //TODO
+            for (int i = 0; i < models.size(); i++) {
+                ImGui::PushID(i);
+                if (ImGui::CollapsingHeader(models[i].getName().c_str()))
+                {
+                    ImGui::DragFloat3("Position", models[i].getTranslation().arr, 0.02);
+                    ImGui::DragFloat3("Rotation", models[i].getRotationPerAxis().arr, 0.1);
+
+                    uint32_t nvert = models[i].getNVertices();
+                    if (ImGui::TreeNode("Vertices", "Vertices (%d)", nvert))
+                    {
+                        for (int j = 0; j < nvert; j++) {
+                            ImGui::PushID(j);
+                            Vertex v = models[i].getVertex(j);
+                            ImGui::DragFloat3("##Vert", v.getPosition(), 0.02);
+                            ImGui::SameLine();
+                            ImGui::ColorEdit4("##VertColor", v.getColor(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+                            ImGui::PopID();
+                        }
+                        ImGui::TreePop();
+                    }
+                }
+                ImGui::PopID();
+            }
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Lights")) {

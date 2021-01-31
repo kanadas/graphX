@@ -42,11 +42,9 @@ bool Input::onKey(KeyEvent& e)
 
 bool Input::onMouseButton(MouseButtonEvent& e)
 {
-    if (e.getAction() == MouseButtonEvent::Action::PRESS && !ImGui::IsWindowHovered()) {
-        //TRACE("Pressed mouse {}", e.getButton());
+    if (e.getAction() == MouseButtonEvent::Action::PRESS) {
         pressedMouseButtons.insert(e.getButton());
     } else if (e.getAction() == MouseButtonEvent::Action::RELEASE) {
-        //TRACE("Released mouse {}", e.getButton());
         pressedMouseButtons.erase(e.getButton());
     }
     return false;
@@ -74,4 +72,9 @@ bool Input::isKeyPressedImpl(int keycode)
 bool Input::isMouseButtonPressedImpl(int button)
 {
     return pressedMouseButtons.count(button) > 0;
+}
+
+void Input::onImGuiImpl()
+{
+    ImGuiWindowHovered = ImGui::IsWindowHovered();
 }

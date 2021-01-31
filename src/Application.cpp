@@ -94,6 +94,7 @@ void Application::run()
             currentTest->onUpdate(timestep);
             currentTest->onRender();
             ImGui::Begin("Test");
+            Input::onImGui();
             if (currentTest != testMenu && ImGui::Button("<-")) {
                 delete currentTest;
                 currentTest = testMenu;

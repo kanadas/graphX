@@ -18,8 +18,10 @@ public:
     inline static float GetMouseY() { return instance->getMouseYImpl(); }
     inline static float GetWindowWidth() { return instance->getWindowWidthImpl(); }
     inline static float GetWindowHeight() { return instance->getWindowHeightImpl(); }
+    inline static bool IsImGuiWindowHovered() { return instance->ImGuiWindowHovered; }
 
-    static void onEvent(Event& e) { instance->onEventImpl(e); };
+    static void onEvent(Event& e) { instance->onEventImpl(e); }
+    static void onImGui() { instance->onImGuiImpl(); }
 private:
     static Input* instance;
     Input(float windowWidth, float windowHeight);
@@ -44,6 +46,9 @@ private:
     bool onMouseButton(MouseButtonEvent& e);
     bool onMouseMoved(MouseMovedEvent& e);
     bool onWindowResize(WindowResizeEvent& e);
+
+    bool ImGuiWindowHovered = false;
+    void onImGuiImpl();
 };
 
 #endif // __INPUT_H_
