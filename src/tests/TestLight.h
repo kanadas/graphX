@@ -54,8 +54,8 @@ private:
 
     Camera camera;
     std::unique_ptr<LightBlock> lights;
-    vec4 defaultAmbient = { 0.1, 0.1, 0.1, 1.0 };
-    vec4 defaultDirect = { 0.4, 0.4, 0.4, 1.0 };
+    vec4 defaultAmbient = { 0.2, 0.2, 0.2, 1.0 };
+    vec4 defaultDirect = { 0.8, 0.8, 0.8, 1.0 };
     vec4 defaultLightPosition = { 0.0, 1.0, 1.0, 0.0 }; //infinetely far
 
     const GLuint MaxQuadCount = 1000;

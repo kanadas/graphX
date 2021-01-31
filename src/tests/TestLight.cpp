@@ -92,8 +92,6 @@ TestLight::TestLight()
     , camera(Camera::Projection::Perspective)
 {
     TRACE("Creating Light test");
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
 
     // clang-format off
     GLuint cube_indices[12*3] = {

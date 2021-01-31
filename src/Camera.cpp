@@ -36,7 +36,7 @@ Camera::Camera(Projection projection)
 
 void Camera::setProjection(Camera::Projection projection, float left, float right, float bottom, float top, float near, float far)
 {
-    TRACE("Projection {} ({}, {}, {}, {}, {}, {})", projection == Ortographic ? "Orto" : "Perspect", left, right, bottom, top, near, far);
+    //TRACE("Projection {} ({}, {}, {}, {}, {}, {})", projection == Ortographic ? "Orto" : "Perspect", left, right, bottom, top, near, far);
     switch (projection) {
     case Ortographic:
         projectionMatrix = mat4::Ortho(left, right, bottom, top, near, far);
@@ -58,7 +58,7 @@ void Camera::recalculateViewMatrix()
     mat4 transform =  mat4::Translation(position) * mat4::Rotation(vec3(0, 0, 1), rotation);
     viewMatrix = transform.inverseAffineIsometry();
     */
-    viewMatrix = mat4::Translation(position * -1) * rotation.inverse().toMatrix();
+    viewMatrix = rotation.inverse().toMatrix() * mat4::Translation(position * -1);
     viewProjectionMatrix = projectionMatrix * viewMatrix;
 }
 
@@ -71,22 +71,22 @@ void Camera::updateRotation(vec3 axis, float delta_angle)
 void Camera::onUpdate(float ts)
 {
     if (Input::IsKeyPressed(GLFW_KEY_A)) {
-        position.arr[0] -= translationSpeed * ts;
-    }
-    if (Input::IsKeyPressed(GLFW_KEY_S)) {
-        position.arr[1] -= translationSpeed * ts;
-    }
-    if (Input::IsKeyPressed(GLFW_KEY_W)) {
-        position.arr[1] += translationSpeed * ts;
-    }
-    if (Input::IsKeyPressed(GLFW_KEY_D)) {
-        position.arr[0] += translationSpeed * ts;
+        position = position + (rotation * vec3(translationSpeed * ts, 0, 0) * -1);
     }
     if (Input::IsKeyPressed(GLFW_KEY_Q)) {
-        position.arr[2] -= translationSpeed * ts;
+        position = position + (rotation * vec3(0, translationSpeed * ts, 0) * -1);
     }
     if (Input::IsKeyPressed(GLFW_KEY_E)) {
-        position.arr[2] += translationSpeed * ts;
+        position = position + (rotation * vec3(0, translationSpeed * ts, 0));
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_D)) {
+        position = position + (rotation * vec3(translationSpeed * ts, 0, 0));
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_W)) {
+        position = position + (rotation * vec3(0, 0, translationSpeed * ts) * -1);
+    }
+    if (Input::IsKeyPressed(GLFW_KEY_S)) {
+        position = position + (rotation * vec3(0, 0, translationSpeed * ts));
     }
     if (Input::IsKeyPressed(GLFW_KEY_F)) {
         zoomLevel += ts * zoomSpeed;
@@ -99,16 +99,15 @@ void Camera::onUpdate(float ts)
         setProjection(projection, -aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
     }
     if (Input::IsKeyPressed(GLFW_KEY_L)) {
-        vec3 axis(0,1,0);
         updateRotation(vec3(0,1,0), -rotationSpeed * ts);
     }
     if (Input::IsKeyPressed(GLFW_KEY_J)) {
         updateRotation(vec3(0,1,0), rotationSpeed * ts);
     }
-    if (Input::IsKeyPressed(GLFW_KEY_I)) {
+    if (Input::IsKeyPressed(GLFW_KEY_K)) {
         updateRotation(vec3(1,0,0), -rotationSpeed * ts);
     }
-    if (Input::IsKeyPressed(GLFW_KEY_K)) {
+    if (Input::IsKeyPressed(GLFW_KEY_I)) {
         updateRotation(vec3(1,0,0), rotationSpeed * ts);
     }
     if (Input::IsKeyPressed(GLFW_KEY_U)) {
@@ -128,8 +127,7 @@ void Camera::onUpdate(float ts)
         dX = dX * 2 * aspectRatio * zoomLevel / Input::GetWindowWidth();
         dY = dY * 2 * zoomLevel / Input::GetWindowHeight();
         if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ) {
-            position.arr[0] += dX;
-            position.arr[1] -= dY;
+            position = position + (rotation * vec3(dX, -dY, 0));
         } else if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
             updateRotation(vec3(dY, dX, 0), rotationSpeed * ts);
         }

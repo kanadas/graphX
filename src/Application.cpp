@@ -42,6 +42,7 @@ Application::Application(const std::string name, uint32_t width, uint32_t height
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
 
     Input::init(width, height);
 
@@ -114,7 +115,6 @@ void Application::run()
 
 static bool keyCallback(KeyEvent& event)
 {
-    TRACE("keyCallback");
     if (event.getKey() == GLFW_KEY_ESCAPE && event.getAction() == KeyEvent::Action::PRESS) {
         Application::Get().close();
         return true;
