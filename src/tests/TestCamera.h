@@ -3,12 +3,12 @@
 
 #include "glad/glad.h"
 #include "Test.h"
-#include "../linalg.h"
-#include "../Texture.h"
-#include "../VertexBuffer.h"
-#include "../VertexBufferLayout.h"
-#include "../Event.h"
-#include "../Camera.h"
+#include "utils/linalg.h"
+#include "scene/Texture.h"
+#include "buffers/VertexBuffer.h"
+#include "buffers/VertexBufferLayout.h"
+#include "Event.h"
+#include "scene/Camera.h"
 
 #include <memory>
 

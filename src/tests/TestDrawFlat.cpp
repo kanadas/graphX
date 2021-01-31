@@ -1,21 +1,21 @@
-#include "TestLight.h"
+#include "TestDrawFlat.h"
 #include <imgui/imgui.h>
 #include "Test.h"
-#include "../Renderer.h"
+#include "Renderer.h"
 
 #include <numeric>
 #include <sstream>
 
 namespace test {
 
-TestLight::LightBlock::LightBlock(std::string name, GLuint program, Light light)
+TestDrawFlat::LightBlock::LightBlock(std::string name, GLuint program, Light light)
     : name(name)
 {
     source.push_back(light);
     createUniformBlock(name, program);
 }
 
-TestLight::LightBlock::LightBlock(std::string name, GLuint program, const std::vector<Light>& lights)
+TestDrawFlat::LightBlock::LightBlock(std::string name, GLuint program, const std::vector<Light>& lights)
     : name(name)
 {
     if (lights.size() > MAX_NLIGHTS) {
@@ -25,12 +25,12 @@ TestLight::LightBlock::LightBlock(std::string name, GLuint program, const std::v
     createUniformBlock(name, program);
 }
 
-TestLight::LightBlock::~LightBlock()
+TestDrawFlat::LightBlock::~LightBlock()
 {
     removeBlock();
 }
 
-void TestLight::LightBlock::addLight(Light light)
+void TestDrawFlat::LightBlock::addLight(Light light)
 {
     if (source.size() == MAX_NLIGHTS) {
         throw new TooManyLightsException();
@@ -39,7 +39,7 @@ void TestLight::LightBlock::addLight(Light light)
     source[source.size() - 1].copyOffsets(source[0], (source.size() - 1) * lightStride);
 }
 
-std::vector<std::string> TestLight::LightBlock::getNames() const
+std::vector<std::string> TestDrawFlat::LightBlock::getNames() const
 {
     std::vector<std::string> names = source[0].getNames();
     names.push_back(names[0]);
@@ -53,7 +53,7 @@ std::vector<std::string> TestLight::LightBlock::getNames() const
     return names;
 }
 
-void TestLight::LightBlock::set() const
+void TestDrawFlat::LightBlock::set() const
 {
     GLuint nSources = source.size();
     setData(&nSources, sizeof(nSources), nSourcesOffset);
@@ -62,7 +62,7 @@ void TestLight::LightBlock::set() const
     }
 }
 
-void TestLight::LightBlock::setOffsets(std::vector<GLint>::iterator& offsets)
+void TestDrawFlat::LightBlock::setOffsets(std::vector<GLint>::iterator& offsets)
 {
     nSourcesOffset = *offsets;
     offsets++;
@@ -74,24 +74,23 @@ void TestLight::LightBlock::setOffsets(std::vector<GLint>::iterator& offsets)
     }
 }
 
-void TestLight::writeQuad(vertex* buff, vec3 pos, float size, vec4 color)
+void TestDrawFlat::writeQuad(int modelIdx, vec3 pos, float size, vec4 color)
 {
     float x = pos.arr[0], y = pos.arr[1], z = pos.arr[2];
     // clang-format off
-    buff[0] = vertex(x,        y,        z, color),
-    buff[1] = vertex(x + size, y,        z, color),
-    buff[2] = vertex(x + size, y + size, z, color),
-    buff[3] = vertex(x,        y + size, z, color);
+    models[modelIdx].addVertex(Vertex::createData(vec3(x,        y,        z), color));
+    models[modelIdx].addVertex(Vertex::createData(vec3(x + size, y,        z), color));
+    models[modelIdx].addVertex(Vertex::createData(vec3(x + size, y + size, z), color));
+    models[modelIdx].addVertex(Vertex::createData(vec3(x,        y + size, z), color));
     // clang-format on
 }
 
-TestLight::TestLight()
-    : Test("Light Test")
-    , translationCube(vec3(-2 * size, 0, -2))
-    , translationTetra(vec3(2 * size, 0, -2))
+TestDrawFlat::TestDrawFlat()
+    : Test("DrawFlat Test")
+    , translation(vec3(0, 0, -2))
     , camera(Camera::Projection::Perspective)
 {
-    TRACE("Creating Light test");
+    TRACE("Creating DrawFlat test");
 
     // clang-format off
     GLuint cube_indices[12*3] = {
@@ -102,88 +101,61 @@ TestLight::TestLight()
         2, 3, 7, 7, 6, 2,
         3, 0, 4, 4, 7, 3,
     };
-
-    GLuint tetrahedron_indices[4*3] = {
-        1, 3, 4,
-        1, 6, 4,
-        3, 4, 6,
-        3, 1, 6,
-    };
     // clang-format on
 
-    VAO = std::make_unique<VertexArray>();
-    indexBufferCube = std::make_unique<IndexBuffer>((GLuint*)cube_indices, 12 * 3);
-    indexBufferTetra = std::make_unique<IndexBuffer>((GLuint*)tetrahedron_indices, 4 * 3);
-    vertexBuffer = std::make_unique<VertexBuffer>(nullptr, MaxVertexCount * sizeof(vertex), GL_DYNAMIC_DRAW);
-    VertexBufferLayout layout;
-    vertex::createLayout(layout);
-    VAO->addBuffer(*vertexBuffer, layout);
+    models.push_back(Model<Vertex>());
+    writeQuad(0, vec3(-0.7, -0.2, 0), 0.4, vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    writeQuad(0, vec3(-0.7, -0.2, -0.4), 0.4, vec4(0.0f, 0.0f, 1.0f, 1.0f));
+    for (int i = 0; i < 12*3; i++) {
+        models[0].addIndex(cube_indices[i]);
+    }
 
     shader = std::make_unique<Shader>("shaders/testLight.glsl.vert", "shaders/testLight.glsl.geom", "shaders/testLight.glsl.frag");
     shader->bind();
 
     Light light(defaultAmbient, defaultDirect, defaultLightPosition);
     lights = std::make_unique<LightBlock>("LightBlock", shader->getRendererId(), light);
-
-    /*
-    vertex background[4];
-    writeQuad(background, vec3(-1, -1, -1), 2, vec4(0, 0, 0, 0), 1);
-    vertexBuffer->sendData(background, sizeof(background));
-    */
 }
 
-TestLight::~TestLight()
+TestDrawFlat::~TestDrawFlat()
 {
 }
 
-void TestLight::onUpdate(float deltatime)
+void TestDrawFlat::onUpdate(float deltatime)
 {
     camera.onUpdate(deltatime);
-    vertex vertices[8];
-    writeQuad(vertices, vec3(-1 * size, -1 * size, 0), 2 * size, vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    writeQuad(vertices + 4, vec3(-1 * size, -1 * size, - 2 * size), 2 * size, vec4(0.0f, 0.0f, 1.0f, 1.0f));
-    vertexBuffer->sendData(vertices, sizeof(vertices));
+    for (int i = 0; i < models.size(); i++) {
+        models[i].sendData();
+    }
 }
 
-void TestLight::onRender()
+void TestDrawFlat::onRender()
 {
     Renderer renderer;
-    renderer.clear();
-
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    mat4 model_cube = mat4::Translation(translationCube.arr);
-    mat4 model_tetra = mat4::Translation(translationTetra.arr);
-    shader->bind();
-
     vec4 eyepos = vec4::point(camera.getPosition());
+    mat4 model = mat4::Translation(translation.arr);
+    mat4 MVPTransform = camera.getViewProjectionMatrix() * model;
+
+    shader->bind();
     shader->setUniform4f("eyepos", eyepos.arr);
+    shader->setUniformMat4f("MVPTransform", MVPTransform.arr);
     lights->set();
-
-    mat4 MVPTransform = camera.getViewProjectionMatrix() * model_cube;
-    mat4 modelTransform = model_cube;
-    shader->setUniformMat4f("MVPTransform", MVPTransform.arr);
-    shader->setUniformMat4f("ModelTransform", modelTransform.arr);
-    renderer.draw(*VAO, *indexBufferCube, *shader, 12 * 3);
-
-    MVPTransform = camera.getViewProjectionMatrix() * model_tetra;
-    modelTransform = model_tetra;
-    shader->setUniformMat4f("MVPTransform", MVPTransform.arr);
-    shader->setUniformMat4f("ModelTransform", modelTransform.arr);
-    renderer.draw(*VAO, *indexBufferTetra, *shader, 4 * 3);
+    for (int i = 0; i < models.size(); i++) {
+        mat4 modelTransform = models[i].getTransform() * model;
+        shader->setUniformMat4f("ModelTransform", modelTransform.arr);
+        models[i].draw(shader);
+    }
 }
 
-void TestLight::onImGuiRender()
+void TestDrawFlat::onImGuiRender()
 {
     if (ImGui::BeginTabBar("Controls")) {
-        if (ImGui::BeginTabItem("Objects")) {
-            ImGui::DragFloat2("Cube position", translationCube.arr, 0.1f);
-            ImGui::DragFloat2("Tetrahedron position", translationTetra.arr, 0.1f);
-            ImGui::DragFloat("Model size", &size, 0.05f);
-            vec3 position = camera.getPosition();
-            ImGui::Text("Camera: position = (%.1f, %.1f, %.1f), aspect = %.3f, zoom = %.1f",
-                position.arr[0], position.arr[1], position.arr[2],
-                camera.getAspectRatio(), camera.getZoomLevel());
+        if (ImGui::BeginTabItem("Flat Models")) {
+            if (ImGui::CollapsingHeader("New Model"))
+            {
+                //ImGui::Text("IsItemHovered: %d", ImGui::IsItemHovered());
+            }
+            //TODO
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Lights")) {
@@ -210,10 +182,13 @@ void TestLight::onImGuiRender()
         }
         ImGui::EndTabBar();
     }
+    vec3 position = camera.getPosition();
+    ImGui::Text("Camera: position = (%.1f, %.1f, %.1f), aspect = %.3f, zoom = %.1f",
+        position.arr[0], position.arr[1], position.arr[2], camera.getAspectRatio(), camera.getZoomLevel());
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
 
-void TestLight::onEvent(Event& e)
+void TestDrawFlat::onEvent(Event& e)
 {
     camera.onEvent(e);
 }

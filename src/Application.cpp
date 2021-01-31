@@ -7,15 +7,7 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include "Window.h"
-#include "IndexBuffer.h"
 #include "Renderer.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
-#include "linalg.h"
-#include "utils/errors.h"
 #include "utils/Log.h"
 #include "Event.h"
 #include "Input.h"
@@ -27,6 +19,7 @@
 #include "tests/TestCamera.h"
 #include "tests/Test3D.h"
 #include "tests/TestLight.h"
+#include "tests/TestDrawFlat.h"
 
 Application* Application::instance = nullptr;
 
@@ -48,7 +41,7 @@ Application::Application(const std::string name, uint32_t width, uint32_t height
 
     TRACE("Initializing test menu");
     testMenu = new test::TestMenu(currentTest);
-    currentTest = new test::TestLight();
+    currentTest = new test::TestDrawFlat();
 
     testMenu->registerTest<test::TestImGui>("ImGui");
     //testMenu->registerTest<test::TestClearColor>("Clear Color");
@@ -57,6 +50,7 @@ Application::Application(const std::string name, uint32_t width, uint32_t height
     testMenu->registerTest<test::TestCamera>("Camera");
     testMenu->registerTest<test::Test3D>("Test 3D");
     testMenu->registerTest<test::TestLight>("Test Light");
+    testMenu->registerTest<test::TestDrawFlat>("Test Draw Flat");
 
 }
 
@@ -87,6 +81,7 @@ void Application::run()
     TRACE("Application started");
     while (running) {
         renderer.clear();
+        glClearColor(0, 0, 0, 0);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

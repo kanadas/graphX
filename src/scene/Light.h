@@ -1,8 +1,8 @@
 #ifndef __LIGHT_H_
 #define __LIGHT_H_
 
-#include "linalg.h"
-#include "UniformBlock.h"
+#include "utils/linalg.h"
+#include "buffers/UniformBlock.h"
 
 class Light : public UniformStruct
 {

@@ -54,10 +54,6 @@ void Camera::setProjection(Camera::Projection projection, float left, float righ
 
 void Camera::recalculateViewMatrix()
 {
-    /*
-    mat4 transform =  mat4::Translation(position) * mat4::Rotation(vec3(0, 0, 1), rotation);
-    viewMatrix = transform.inverseAffineIsometry();
-    */
     viewMatrix = rotation.inverse().toMatrix() * mat4::Translation(position * -1);
     viewProjectionMatrix = projectionMatrix * viewMatrix;
 }

@@ -2,6 +2,7 @@
 
 #include "utils/Log.h"
 #include "Application.h"
+#include <imgui/imgui.h>
 
 Input* Input::instance = nullptr;
 
@@ -41,7 +42,7 @@ bool Input::onKey(KeyEvent& e)
 
 bool Input::onMouseButton(MouseButtonEvent& e)
 {
-    if (e.getAction() == MouseButtonEvent::Action::PRESS) {
+    if (e.getAction() == MouseButtonEvent::Action::PRESS && !ImGui::IsWindowHovered()) {
         //TRACE("Pressed mouse {}", e.getButton());
         pressedMouseButtons.insert(e.getButton());
     } else if (e.getAction() == MouseButtonEvent::Action::RELEASE) {

@@ -1,5 +1,5 @@
-#ifndef __TESTLIGHT_H_
-#define __TESTLIGHT_H_
+#ifndef __TESTDRAWFLAT_H_
+#define __TESTDRAWFLAT_H_
 
 #include "glad/glad.h"
 #include "Test.h"
@@ -12,28 +12,19 @@
 #include "Event.h"
 #include "scene/Camera.h"
 #include "scene/Light.h"
+#include "scene/Model.h"
+#include "scene/Vertex.h"
 
 #include <memory>
 
 namespace test {
 
-class TestLight : public Test {
+class TestDrawFlat : public Test {
 private:
-    std::unique_ptr<VertexArray> VAO;
-    std::unique_ptr<IndexBuffer> indexBufferCube;
-    std::unique_ptr<IndexBuffer> indexBufferTetra;
-    std::unique_ptr<VertexBuffer> vertexBuffer;
     std::unique_ptr<Shader> shader;
-    GLfloat size = 0.2f;
-    vec3 translationCube;
-    vec3 translationTetra;
-    GLuint indexCount = 12 * 3;
+    vec3 translation;
 
     Camera camera;
-
-    const GLuint MaxQuadCount = 1000;
-    const GLuint MaxVertexCount = MaxQuadCount * 4;
-    const GLuint MaxIndexCount = MaxQuadCount * 6;
 
     class LightBlock : public UniformBlock {
     public:
@@ -63,36 +54,13 @@ private:
     vec4 defaultLightPosition = { 0.0, 1.0, 1.0, 0.0 }; //infinetely far
     bool infDistLight[LightBlock::MAX_NLIGHTS] = { true };
 
-    struct vertex {
-        GLfloat position[3];
-        GLfloat color[4];
+    std::vector<Model<Vertex>> models;
 
-        vertex() { }
-
-        vertex(GLfloat position[3], GLfloat color[4])
-        {
-            memcpy(this->position, position, 3 * sizeof(GLfloat));
-            memcpy(this->color, color, 4 * sizeof(GLfloat));
-        }
-
-        vertex(GLfloat x, GLfloat y, GLfloat z, vec4 color)
-            : position { x, y, z }
-        {
-            memcpy(this->color, color.arr, 4 * sizeof(GLfloat));
-        }
-
-        static void createLayout(VertexBufferLayout& layout)
-        {
-            layout.push(3, GL_FLOAT); //position
-            layout.push(4, GL_FLOAT); //color
-        }
-    };
-
-    static void writeQuad(vertex* buff, vec3 pos, float size, vec4 color);
+    void writeQuad(int modelIdx, vec3 pos, float size, vec4 color);
 
 public:
-    TestLight();
-    ~TestLight();
+    TestDrawFlat();
+    ~TestDrawFlat();
 
     void onUpdate(float deltatime) override;
     void onRender() override;
@@ -105,4 +73,4 @@ public:
 
 }
 
-#endif // __TESTLIGHT_H_
+#endif // __TESTDRAWFLAT_H_

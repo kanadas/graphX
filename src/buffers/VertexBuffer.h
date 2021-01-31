@@ -16,6 +16,7 @@ public:
     void unbind() const;
 
     void sendData(const void* data, GLuint size, GLuint offset = 0);
+    void reset(const void* data, GLuint size, GLenum usage);
 };
 
 #endif // __VERTEXBUFFER_H_

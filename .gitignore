@@ -1,4 +1,5 @@
 *.o
 *.d
 *~
+*vgcore*
 src/App

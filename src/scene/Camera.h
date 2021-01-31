@@ -1,8 +1,9 @@
 #ifndef __CAMERA_H_
 #define __CAMERA_H_
 
-#include "linalg.h"
+#include "utils/linalg.h"
 #include "Event.h"
+
 class Camera {
 public:
     enum Projection {
@@ -53,7 +54,7 @@ private:
     const float minZoom = 0.25f;
     const float maxZoom = 10.0f;
     const float defaultNear = 1.0f;
-    const float defaultFar = 10.0f;
+    const float defaultFar = 3.0f;
     float lastMouseX, lastMouseY;
 
     Camera(Projection projection, float left, float right, float bottom, float top, float near, float far);
