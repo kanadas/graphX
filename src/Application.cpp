@@ -93,7 +93,7 @@ void Application::run()
             lastFrameTime = time;
             currentTest->onUpdate(timestep);
             currentTest->onRender();
-            ImGui::Begin("Test");
+            ImGui::Begin(currentTest->getName().c_str());
             Input::onImGui();
             if (currentTest != testMenu && ImGui::Button("<-")) {
                 delete currentTest;

@@ -86,7 +86,7 @@ void TestDrawFlat::writeQuad(int modelIdx, vec3 pos, float size, vec4 color)
 }
 
 TestDrawFlat::TestDrawFlat()
-    : Test("DrawFlat Test")
+    : Test("Flat modeling tool")
     , translation(vec3(0, 0, -2))
     , camera(Camera::Projection::Perspective)
     , lineModel("", 3, 6)
@@ -198,7 +198,7 @@ vec3 TestDrawFlat::getVertexPosition(int modelIdx, int idx)
     Vertex v = models[modelIdx].getVertex(idx);
     mat4 mtrans = models[modelIdx].getTransform();
     vec3 pos(v.getPosition());
-    return mtrans * vec4::point(pos);
+    return vec3(mtrans * vec4::point(pos)) + vec3(0,0,0.01);
 }
 
 void TestDrawFlat::vertexHovered(int modelIdx, int idx)
