@@ -19,8 +19,8 @@ public:
     {
     }
 
-    GLfloat* getPosition() { return position; }
-    GLfloat* getColor() { return color; }
+    GLfloat* getPosition() const { return position; }
+    GLfloat* getColor() const { return color; }
 
     static void createLayout(VertexBufferLayout& layout)
     {
@@ -38,6 +38,14 @@ public:
         std::array<uint8_t, SIZE> res;
         memcpy(res.data(), position.arr, 3 * sizeof(GLfloat));
         memcpy(res.data() + 3 * sizeof(GLfloat), color.arr, 4 * sizeof(GLfloat));
+        return res;
+    }
+
+    static std::array<uint8_t, SIZE> copyData(const Vertex& other)
+    {
+        std::array<uint8_t, SIZE> res;
+        memcpy(res.data(), other.getPosition(), 3 * sizeof(GLfloat));
+        memcpy(res.data() + 3 * sizeof(GLfloat), other.getColor(), 4 * sizeof(GLfloat));
         return res;
     }
 

@@ -23,6 +23,7 @@ namespace test {
 class TestDrawFlat : public Test {
 private:
     std::unique_ptr<Shader> shader;
+    std::unique_ptr<Shader> pointLineShader;
     vec3 translation;
 
     Camera camera;
@@ -56,6 +57,16 @@ private:
     bool infDistLight[LightBlock::MAX_NLIGHTS] = { true };
 
     std::vector<Model<Vertex>> models;
+    PointModel<Vertex> hoveredModel;
+    PointModel<Vertex> selectedModel;
+    LineModel<Vertex> lineModel;
+    bool isHovered = false;
+    vec3 newVertexPos = vec3(0,0,0);
+    vec4 newVertexCol = vec4(0,0,0,1);
+
+    vec3 getVertexPosition(int modelIdx, int idx);
+    void vertexHovered(int model, int idx);
+    void newVertexHovered();
 
     void writeQuad(int modelIdx, vec3 pos, float size, vec4 color);
 

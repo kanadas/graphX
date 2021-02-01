@@ -14,6 +14,8 @@ public:
     void clear() const;
     void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
     void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, GLuint count) const;
+    void drawPoints(const VertexArray& va, const Shader& shader, GLuint count) const;
+    void drawLines(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, GLuint count) const;
 };
 
 #endif // __RENDERER_H_

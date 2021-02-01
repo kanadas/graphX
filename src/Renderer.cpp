@@ -17,3 +17,19 @@ void Renderer::draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 {
     draw(va, ib, shader, ib.getCount());
 }
+
+void Renderer::drawPoints(const VertexArray& va, const Shader& shader, GLuint count) const
+{
+    shader.bind();
+    va.bind();
+    glPointSize(10.0);
+    glDrawArrays(GL_POINTS, 0, count);
+}
+
+void Renderer::drawLines(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, GLuint count) const
+{
+    shader.bind();
+    va.bind();
+    ib.bind();
+    glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, NULL);
+}

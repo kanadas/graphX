@@ -120,7 +120,8 @@ void Camera::onUpdate(float ts)
     float dY = lastMouseY - mouseY;
     lastMouseX = mouseX;
     lastMouseY = mouseY;
-    if (!Input::IsImGuiWindowHovered() && (dX != 0 || dY != 0)) {
+    //if (!Input::IsImGuiWindowHovered() && (dX != 0 || dY != 0)) {
+    if (!ImGui::GetIO().WantCaptureMouse && (dX != 0 || dY != 0)) {
         dX = dX * 2 * aspectRatio * zoomLevel / Input::GetWindowWidth();
         dY = dY * 2 * zoomLevel / Input::GetWindowHeight();
         if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ) {
@@ -142,9 +143,11 @@ void Camera::onEvent(Event& e)
 
 bool Camera::onMouseScrolled(MouseScrolledEvent& e)
 {
-    zoomLevel -= e.getYOffset() * zoomSpeed;
-    zoomLevel = std::min(std::max(zoomLevel, minZoom), maxZoom);
-    setProjection(projection, -aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
+    if (!ImGui::GetIO().WantCaptureMouse) {
+        zoomLevel -= e.getYOffset() * zoomSpeed;
+        zoomLevel = std::min(std::max(zoomLevel, minZoom), maxZoom);
+        setProjection(projection, -aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
+    }
     return false;
 }
 

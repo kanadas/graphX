@@ -89,6 +89,9 @@ TestDrawFlat::TestDrawFlat()
     : Test("DrawFlat Test")
     , translation(vec3(0, 0, -2))
     , camera(Camera::Projection::Perspective)
+    , lineModel("", 3, 6)
+    , hoveredModel("", 1)
+    , selectedModel("", 3)
 {
     TRACE("Creating DrawFlat test");
 
@@ -106,11 +109,12 @@ TestDrawFlat::TestDrawFlat()
     models.push_back(Model<Vertex>("Cube"));
     writeQuad(0, vec3(-0.2, -0.2, 0.2), 0.4, vec4(1.0f, 0.0f, 0.0f, 1.0f));
     writeQuad(0, vec3(-0.2, -0.2, -0.2), 0.4, vec4(0.0f, 0.0f, 1.0f, 1.0f));
-    for (int i = 0; i < 12*3; i++) {
+    for (int i = 0; i < 12 * 3; i++) {
         models[0].addIndex(cube_indices[i]);
     }
-    //models[0].setTranslation(vec3(-0.5, 0, 0));
+    hoveredModel.addVertex(Vertex::createData(vec3(0, 0, 0), vec4(0, 0, 1, 1)));
 
+    pointLineShader = std::make_unique<Shader>("shaders/pointLine.glsl.vert", "shaders/pointLine.glsl.frag");
     shader = std::make_unique<Shader>("shaders/testLight.glsl.vert", "shaders/testLight.glsl.geom", "shaders/testLight.glsl.frag");
     shader->bind();
 
@@ -128,6 +132,10 @@ void TestDrawFlat::onUpdate(float deltatime)
     for (int i = 0; i < models.size(); i++) {
         models[i].sendData();
     }
+
+    if (isHovered) {
+        hoveredModel.sendData();
+    }
 }
 
 void TestDrawFlat::onRender()
@@ -135,16 +143,50 @@ void TestDrawFlat::onRender()
     Renderer renderer;
     mat4 model = mat4::Translation(translation.arr);
     vec4 eyepos = vec4::point(camera.getPosition() + translation * -1);
+    mat4 viewProj = camera.getViewProjectionMatrix();
 
     shader->bind();
     shader->setUniform4f("eyepos", eyepos.arr);
     lights->set();
     for (int i = 0; i < models.size(); i++) {
         mat4 modelTransform = model * models[i].getTransform();
-        mat4 MVPTransform = camera.getViewProjectionMatrix() * modelTransform;
+        mat4 MVPTransform = viewProj * modelTransform;
         shader->setUniformMat4f("ModelTransform", modelTransform.arr);
         shader->setUniformMat4f("MVPTransform", MVPTransform.arr);
         models[i].draw(shader);
+    }
+    pointLineShader->bind();
+    pointLineShader->setUniformMat4f("MVP", viewProj * model);
+    if (isHovered) {
+        hoveredModel.draw(pointLineShader);
+        isHovered = false;
+    }
+    selectedModel.draw(pointLineShader);
+    lineModel.draw(pointLineShader);
+}
+
+vec3 TestDrawFlat::getVertexPosition(int modelIdx, int idx)
+{
+    Vertex v = models[modelIdx].getVertex(idx);
+    mat4 mtrans = models[modelIdx].getTransform();
+    vec3 pos(v.getPosition());
+    return mtrans * vec4::point(pos);
+}
+
+void TestDrawFlat::vertexHovered(int modelIdx, int idx)
+{
+    if (ImGui::IsItemHovered()) {
+        isHovered = true;
+        vec3 pos = getVertexPosition(modelIdx, idx);
+        memcpy(hoveredModel.getVertex(0).getPosition(), pos.arr, 3 * sizeof(GLfloat));
+    }
+}
+
+void TestDrawFlat::newVertexHovered()
+{
+    if (ImGui::IsItemHovered()) {
+        isHovered = true;
+        memcpy(hoveredModel.getVertex(0).getPosition(), newVertexPos.arr, 3 * sizeof(GLfloat));
     }
 }
 
@@ -152,27 +194,46 @@ void TestDrawFlat::onImGuiRender()
 {
     if (ImGui::BeginTabBar("Controls")) {
         if (ImGui::BeginTabItem("Flat Models")) {
-            if (ImGui::CollapsingHeader("New Model"))
-            {
+            if (ImGui::CollapsingHeader("New Model")) {
             }
             for (int i = 0; i < models.size(); i++) {
                 ImGui::PushID(i);
-                if (ImGui::CollapsingHeader(models[i].getName().c_str()))
-                {
+                if (ImGui::CollapsingHeader(models[i].getName().c_str())) {
                     ImGui::DragFloat3("Position", models[i].getTranslation().arr, 0.02);
                     ImGui::DragFloat3("Rotation", models[i].getRotationPerAxis().arr, 0.1);
 
                     uint32_t nvert = models[i].getNVertices();
-                    if (ImGui::TreeNode("Vertices", "Vertices (%d)", nvert))
-                    {
+                    if (ImGui::TreeNode("Vertices", "Vertices (%d)", nvert)) {
                         for (int j = 0; j < nvert; j++) {
                             ImGui::PushID(j);
                             Vertex v = models[i].getVertex(j);
                             ImGui::DragFloat3("##Vert", v.getPosition(), 0.02);
+                            vertexHovered(i, j);
                             ImGui::SameLine();
                             ImGui::ColorEdit4("##VertColor", v.getColor(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+                            vertexHovered(i, j);
+                            ImGui::SameLine();
+                            if (ImGui::Button("Delete")) {
+                                models[i].removeVertex(j);
+                                ImGui::PopID();
+                                break;
+                            }
+                            vertexHovered(i, j);
+                            //ImGui::Checkbox("##VertCheck", ); //TODO
                             ImGui::PopID();
                         }
+                        ImGui::DragFloat3("##NewVert", newVertexPos.arr, 0.02);
+                        newVertexHovered();
+                        ImGui::SameLine();
+                        ImGui::ColorEdit4("##NewVertColor", newVertexCol.arr, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+                        newVertexHovered();
+                        ImGui::SameLine();
+                        if (ImGui::Button("Create")) {
+                            models[i].addVertex(Vertex::createData(newVertexPos, newVertexCol));
+                            newVertexPos = vec3(0,0,0);
+                            newVertexCol = vec4(0,0,0,1);
+                        }
+                        newVertexHovered();
                         ImGui::TreePop();
                     }
                 }
