@@ -190,7 +190,7 @@ public:
     {
         Renderer renderer;
         if (this->nVertices >= 2 && this->indices.size() >= 2) {
-            renderer.drawLines(*this->VAO, *this->indexBuffer, *shader, this->nVertices);
+            renderer.drawLines(*this->VAO, *this->indexBuffer, *shader, this->indices.size());
         }
     }
 

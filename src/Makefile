@@ -2,7 +2,7 @@ ODIR		= obj
 LDIR 		= ../lib
 
 CC 			= g++
-CFLAGS 		= -I. -I$(LDIR) -rdynamic `pkg-config --cflags glfw3` `pkg-config spdlog --cflags`
+CFLAGS 		= -g -I. -I$(LDIR) -rdynamic `pkg-config --cflags glfw3` `pkg-config spdlog --cflags`
 VPATH 		= tests util
 
 LIBFLAGS 	= `pkg-config --static --libs glfw3` `pkg-config --static --libs spdlog`

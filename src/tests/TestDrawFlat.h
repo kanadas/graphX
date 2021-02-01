@@ -56,17 +56,25 @@ private:
     vec4 defaultLightPosition = { 0.0, 1.0, 1.0, 0.0 }; //infinetely far
     bool infDistLight[LightBlock::MAX_NLIGHTS] = { true };
 
+    char newModelName[100] = "";
     std::vector<Model<Vertex>> models;
     PointModel<Vertex> hoveredModel;
     PointModel<Vertex> selectedModel;
     LineModel<Vertex> lineModel;
-    bool isHovered = false;
+    bool isVertexHovered = false;
     vec3 newVertexPos = vec3(0,0,0);
     vec4 newVertexCol = vec4(0,0,0,1);
+    std::vector<std::vector<uint8_t>> selectedVertices;
+    std::vector<std::vector<int32_t>> selectedVerticesIndices;
+    std::vector<int> numSelectedVertices;
+    bool isTriangleHovered = false;
 
     vec3 getVertexPosition(int modelIdx, int idx);
-    void vertexHovered(int model, int idx);
+    void vertexHovered(int modelIdx, int idx);
     void newVertexHovered();
+    void vertexSelected(int modelIdx, int idx);
+    void vertexUnSelected(int modelIdx, int idx);
+    void triangleHovered(int modelIdx, int idx);
 
     void writeQuad(int modelIdx, vec3 pos, float size, vec4 color);
 

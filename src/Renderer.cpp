@@ -31,5 +31,6 @@ void Renderer::drawLines(const VertexArray& va, const IndexBuffer& ib, const Sha
     shader.bind();
     va.bind();
     ib.bind();
+    glLineWidth(5.0);
     glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, NULL);
 }

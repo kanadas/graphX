@@ -113,6 +113,18 @@ TestDrawFlat::TestDrawFlat()
         models[0].addIndex(cube_indices[i]);
     }
     hoveredModel.addVertex(Vertex::createData(vec3(0, 0, 0), vec4(0, 0, 1, 1)));
+    for (int i = 0; i < 3; i++) {
+        lineModel.addVertex(Vertex::createData(vec3(0, 0, 0), vec4(1, 1, 1, 1)));
+    }
+    for (int i = 0; i < 3; i++) {
+        lineModel.addIndex(i);
+        lineModel.addIndex((i + 1) % 3);
+    }
+    numSelectedVertices.push_back(0);
+    selectedVertices.emplace_back();
+    selectedVertices[0].assign(8, 0);
+    selectedVerticesIndices.emplace_back();
+    selectedVerticesIndices[0].assign(8, -1);
 
     pointLineShader = std::make_unique<Shader>("shaders/pointLine.glsl.vert", "shaders/pointLine.glsl.frag");
     shader = std::make_unique<Shader>("shaders/testLight.glsl.vert", "shaders/testLight.glsl.geom", "shaders/testLight.glsl.frag");
@@ -133,8 +145,21 @@ void TestDrawFlat::onUpdate(float deltatime)
         models[i].sendData();
     }
 
-    if (isHovered) {
+    if (isVertexHovered) {
         hoveredModel.sendData();
+    }
+    for (int i = 0; i < models.size(); i++) {
+        for (int j = 0; j < models[i].getNVertices(); j++) {
+            if (selectedVertices[i][j]) {
+                vec3 pos = getVertexPosition(i, j);
+                Vertex v = selectedModel.getVertex(selectedVerticesIndices[i][j]);
+                memcpy(v.getPosition(), pos.arr, 3 * sizeof(GLfloat));
+            }
+        }
+    }
+    selectedModel.sendData();
+    if (isTriangleHovered) {
+        lineModel.sendData();
     }
 }
 
@@ -157,12 +182,15 @@ void TestDrawFlat::onRender()
     }
     pointLineShader->bind();
     pointLineShader->setUniformMat4f("MVP", viewProj * model);
-    if (isHovered) {
+    if (isVertexHovered) {
         hoveredModel.draw(pointLineShader);
-        isHovered = false;
+        isVertexHovered = false;
     }
     selectedModel.draw(pointLineShader);
-    lineModel.draw(pointLineShader);
+    if (isTriangleHovered) {
+        lineModel.draw(pointLineShader);
+        isTriangleHovered = false;
+    }
 }
 
 vec3 TestDrawFlat::getVertexPosition(int modelIdx, int idx)
@@ -176,7 +204,7 @@ vec3 TestDrawFlat::getVertexPosition(int modelIdx, int idx)
 void TestDrawFlat::vertexHovered(int modelIdx, int idx)
 {
     if (ImGui::IsItemHovered()) {
-        isHovered = true;
+        isVertexHovered = true;
         vec3 pos = getVertexPosition(modelIdx, idx);
         memcpy(hoveredModel.getVertex(0).getPosition(), pos.arr, 3 * sizeof(GLfloat));
     }
@@ -185,8 +213,44 @@ void TestDrawFlat::vertexHovered(int modelIdx, int idx)
 void TestDrawFlat::newVertexHovered()
 {
     if (ImGui::IsItemHovered()) {
-        isHovered = true;
+        isVertexHovered = true;
         memcpy(hoveredModel.getVertex(0).getPosition(), newVertexPos.arr, 3 * sizeof(GLfloat));
+    }
+}
+
+void TestDrawFlat::vertexSelected(int modelIdx, int idx)
+{
+    numSelectedVertices[modelIdx]++;
+    selectedVerticesIndices[modelIdx][idx] = selectedModel.getNVertices();
+    vec3 pos = getVertexPosition(modelIdx, idx);
+    selectedModel.addVertex(Vertex::createData(pos, vec4(1, 0, 0, 1)));
+}
+
+void TestDrawFlat::vertexUnSelected(int modelIdx, int idx)
+{
+    numSelectedVertices[modelIdx]--;
+    selectedVertices[modelIdx][idx] = 0;
+    selectedModel.removeVertex(selectedVerticesIndices[modelIdx][idx]);
+    for (int i = 0; i < models.size(); i++) {
+        for (int j = 0; j < models[i].getNVertices(); j++) {
+            if (selectedVerticesIndices[i][j] > selectedVerticesIndices[modelIdx][idx]) {
+                TRACE(" selectedVerticesIndices[i][j] = {}", selectedVerticesIndices[i][j]);
+                selectedVerticesIndices[i][j]--;
+            }
+        }
+    }
+    selectedVerticesIndices[modelIdx][idx] = -1;
+}
+
+void TestDrawFlat::triangleHovered(int modelIdx, int idx)
+{
+    if (ImGui::IsItemHovered()) {
+        isTriangleHovered = true;
+        const std::vector<GLuint> indices = models[modelIdx].getIndices();
+        for (int i = 0; i < 3; i++) {
+            vec3 pos = getVertexPosition(modelIdx, indices[idx * 3 + i]);
+            memcpy(lineModel.getVertex(i).getPosition(), pos.arr, 3 * sizeof(GLfloat));
+        }
     }
 }
 
@@ -194,7 +258,14 @@ void TestDrawFlat::onImGuiRender()
 {
     if (ImGui::BeginTabBar("Controls")) {
         if (ImGui::BeginTabItem("Flat Models")) {
-            if (ImGui::CollapsingHeader("New Model")) {
+            ImGui::InputTextWithHint("##New Model Name", "New model name", newModelName, 20);
+            ImGui::SameLine();
+            if (ImGui::Button("Create New Model")) {
+                models.push_back(Model<Vertex>(std::string(newModelName)));
+                selectedVertices.emplace_back();
+                selectedVerticesIndices.emplace_back();
+                numSelectedVertices.push_back(0);
+                newModelName[0] = 0;
             }
             for (int i = 0; i < models.size(); i++) {
                 ImGui::PushID(i);
@@ -204,6 +275,24 @@ void TestDrawFlat::onImGuiRender()
 
                     uint32_t nvert = models[i].getNVertices();
                     if (ImGui::TreeNode("Vertices", "Vertices (%d)", nvert)) {
+                        if (ImGui::Button("Add triangle")) {
+                            if (numSelectedVertices[i] == 3) {
+                                for (int j = 0; j < nvert; j++) {
+                                    if (selectedVertices[i][j]) {
+                                        models[i].addIndex(j);
+                                    }
+                                }
+                            }
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Deselect all")) {
+                            for (int j = 0; j < nvert; j++) {
+                                if (selectedVertices[i][j]) {
+                                    TRACE("Unselecting {} {}", i, j);
+                                    vertexUnSelected(i, j);
+                                }
+                            }
+                        }
                         for (int j = 0; j < nvert; j++) {
                             ImGui::PushID(j);
                             Vertex v = models[i].getVertex(j);
@@ -215,11 +304,28 @@ void TestDrawFlat::onImGuiRender()
                             ImGui::SameLine();
                             if (ImGui::Button("Delete")) {
                                 models[i].removeVertex(j);
+                                if (selectedVertices[i][j]) {
+                                    vertexUnSelected(i, j);
+                                }
+                                selectedVertices[i].erase(selectedVertices[i].begin() + j);
+                                selectedVerticesIndices[i].erase(selectedVerticesIndices[i].begin() + j);
                                 ImGui::PopID();
                                 break;
                             }
                             vertexHovered(i, j);
-                            //ImGui::Checkbox("##VertCheck", ); //TODO
+                            ImGui::SameLine();
+                            if (ImGui::Checkbox("##VertCheck", (bool*)&selectedVertices[i][j])) {
+                                if (selectedVertices[i][j]) {
+                                    if (numSelectedVertices[i] == 3) {
+                                        selectedVertices[i][j] = 0;
+                                    } else {
+                                        vertexSelected(i, j);
+                                    }
+                                } else {
+                                    vertexUnSelected(i, j);
+                                }
+                            }
+                            vertexHovered(i, j);
                             ImGui::PopID();
                         }
                         ImGui::DragFloat3("##NewVert", newVertexPos.arr, 0.02);
@@ -229,11 +335,37 @@ void TestDrawFlat::onImGuiRender()
                         newVertexHovered();
                         ImGui::SameLine();
                         if (ImGui::Button("Create")) {
+                            TRACE("Creating vertex");
                             models[i].addVertex(Vertex::createData(newVertexPos, newVertexCol));
-                            newVertexPos = vec3(0,0,0);
-                            newVertexCol = vec4(0,0,0,1);
+                            TRACE("Added vertex");
+                            selectedVertices[i].push_back(0);
+                            selectedVerticesIndices[i].push_back(0);
+                            newVertexPos = vec3(0, 0, 0);
+                            newVertexCol = vec4(0, 0, 0, 1);
+                            TRACE("Created vertex");
+                            ImGui::TreePop();
+                            ImGui::PopID();
+                            break;
                         }
                         newVertexHovered();
+                        ImGui::TreePop();
+                    }
+                    const std::vector<GLuint> indices = models[i].getIndices();
+                    int ntriang = indices.size() / 3;
+                    if (ImGui::TreeNode("Triangles", "Triangles (%d)", ntriang)) {
+                        for (int j = 0; j < ntriang; j++) {
+                            ImGui::PushID(j);
+                            ImGui::Text("Triangle %2d (%3d, %3d, %3d)", j, indices[j * 3], indices[j * 3 + 1], indices[j * 3 + 2]);
+                            triangleHovered(i, j);
+                            ImGui::SameLine();
+                            if (ImGui::Button("Delete")) {
+                                models[i].removeTriangle(j);
+                                ImGui::PopID();
+                                break;
+                            }
+                            triangleHovered(i, j);
+                            ImGui::PopID();
+                        }
                         ImGui::TreePop();
                     }
                 }

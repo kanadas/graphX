@@ -30,7 +30,7 @@ void Input::onEventImpl(Event& e)
 
 bool Input::onKey(KeyEvent& e)
 {
-    if (e.getAction() == KeyEvent::Action::PRESS) {
+    if (!ImGui::GetIO().WantCaptureKeyboard && e.getAction() == KeyEvent::Action::PRESS) {
         //TRACE("Pressed key {}", e.getKey());
         pressedKeys.insert(e.getKey());
     } else if (e.getAction() == KeyEvent::Action::RELEASE) {
@@ -42,7 +42,7 @@ bool Input::onKey(KeyEvent& e)
 
 bool Input::onMouseButton(MouseButtonEvent& e)
 {
-    if (e.getAction() == MouseButtonEvent::Action::PRESS) {
+    if (!ImGui::GetIO().WantCaptureMouse && e.getAction() == MouseButtonEvent::Action::PRESS) {
         pressedMouseButtons.insert(e.getButton());
     } else if (e.getAction() == MouseButtonEvent::Action::RELEASE) {
         pressedMouseButtons.erase(e.getButton());

@@ -120,8 +120,7 @@ void Camera::onUpdate(float ts)
     float dY = lastMouseY - mouseY;
     lastMouseX = mouseX;
     lastMouseY = mouseY;
-    //if (!Input::IsImGuiWindowHovered() && (dX != 0 || dY != 0)) {
-    if (!ImGui::GetIO().WantCaptureMouse && (dX != 0 || dY != 0)) {
+    if (dX != 0 || dY != 0) {
         dX = dX * 2 * aspectRatio * zoomLevel / Input::GetWindowWidth();
         dY = dY * 2 * zoomLevel / Input::GetWindowHeight();
         if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT) ) {
